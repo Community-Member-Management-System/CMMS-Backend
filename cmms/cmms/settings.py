@@ -123,3 +123,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'account.User'
+
+CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
+CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
