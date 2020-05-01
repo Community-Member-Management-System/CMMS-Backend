@@ -12,12 +12,10 @@ from urllib.request import urlopen
 from xml.etree import ElementTree
 
 from django.contrib.auth import login, authenticate, logout
-from django.http import JsonResponse, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import render, redirect
-from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
-from django.views import View
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import redirect
 from django.conf import settings
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
@@ -26,21 +24,19 @@ from .models import User
 class BaseLoginView(APIView):
     """
     BaseLoginView is a View supporting traditional login (through username and password)
+    This view supports POST.
     """
     backend = 'django.contrib.auth.backends.ModelBackend'
     template_name: str
     template_context = None
-
-    def get(self, request):
-        return HttpResponseNotAllowed(['POST'])
 
     def post(self, request):
         username = self.request.data.get('username')
         password = self.request.data.get('password')
         if authenticate(self.request, username=username, password=password):
             self.login(username=username)
-            return HttpResponse("登录成功。")
-        return HttpResponse("登录失败。")
+            return Response("登录成功。")
+        return Response("登录失败。")
 
     def login(self, **kwargs):
         if kwargs.get("get_or_create"):
@@ -56,6 +52,10 @@ class BaseLoginView(APIView):
 
 
 class CASLoginView(BaseLoginView):
+    """
+    CASLoginView inherits from BaseLoginView, with CAS support.
+    This view supports GET (intended for a <a href="..."></a> tag), as it needs 302 to CAS server.
+    """
     service: str
     ticket: str
     gid: str
@@ -72,8 +72,8 @@ class CASLoginView(BaseLoginView):
             return redirect(f'{settings.CAS_SERVICE_URL}/login?{urlencode({"service": service})}')
         if self.check_ticket():
             self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
-            return HttpResponse("登录成功。")
-        return HttpResponse("登录失败。")
+            return Response("登录成功。")
+        return Response("登录失败。")
 
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
@@ -96,5 +96,5 @@ class CASLoginView(BaseLoginView):
 class LogoutView(APIView):
     def post(self, request):
         logout(request)
-        return HttpResponse("注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
+        return Response("注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
         f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。")
