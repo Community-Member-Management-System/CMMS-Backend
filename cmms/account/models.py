@@ -15,8 +15,9 @@ class UserManager(BaseUserManager):
         user.save(using=self.db)
         return user
 
-    def create_super_user(self, gid, student_id, password=None, **extra_fields):
+    def create_superuser(self, gid, student_id, password=None, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_staff', True)
         return self.create_user(gid, student_id, password, **extra_fields)
 
 
@@ -35,10 +36,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar_url = models.URLField(_("头像"), blank=True)
     date_joined = models.DateTimeField(_('注册时间'), default=timezone.now)
     last_login = models.DateTimeField(_('上次登录时间'), blank=True, null=True)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('对 admin/ 管理页的只读权限'),
+    )  # for compatibility with Django Admin
 
     USERNAME_FIELD = 'gid'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['student_id']
+
+    objects = UserManager()
 
     def get_full_name(self):
         return f"{self.nick_name} ({self.actual_name}, {self.student_id})"
