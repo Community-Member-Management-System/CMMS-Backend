@@ -34,5 +34,6 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        flake8
+      working-directory: ./cmms
+        flake8 --config=../.flake8
         python cmms/manage.py test
