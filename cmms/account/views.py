@@ -36,8 +36,12 @@ class BaseLoginView(APIView):
         password = self.request.data.get('password')
         if authenticate(self.request, username=username, password=password):
             self.login(username=username)
-            return Response("登录成功。")
-        return Response("登录失败。", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                "msg": "登录成功。"
+            })
+        return Response({
+            "msg": "登录失败。"
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
     def login(self, **kwargs):
         if kwargs.get("get_or_create"):
@@ -73,8 +77,12 @@ class CASLoginView(BaseLoginView):
             return redirect(f'{settings.CAS_SERVICE_URL}/login?{urlencode({"service": service})}')
         if self.check_ticket():
             self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
-            return Response("登录成功。")
-        return Response("登录失败。", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                "msg": "登录成功。"
+            })
+        return Response({
+            "msg": "登录失败。"
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
@@ -97,5 +105,7 @@ class CASLoginView(BaseLoginView):
 class LogoutView(APIView):
     def post(self, request):
         logout(request)
-        return Response("注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
-                        f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。")
+        return Response({
+            "msg": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
+                   f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
+        })
