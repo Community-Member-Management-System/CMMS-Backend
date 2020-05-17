@@ -26,9 +26,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     A great documentation by Django about custom user model:
     https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#specifying-a-custom-user-model
     """
-    gid = models.CharField(_("GID"), max_length=16, primary_key=True)
+    VISIBILITY_CHOICES = (
+        ('0', '公开'),
+        ('1', '仅社团成员可见'),
+        ('2', '仅管理员可见'),
+    )
+
+    gid = models.CharField(_("GID"), max_length=16, unique=True)
     student_id = models.CharField(_("学号"), max_length=10, unique=True)
-    actual_name = models.CharField(_("真实姓名"), max_length=16)
+    real_name = models.CharField(_("真实姓名"), max_length=16)
     nick_name = models.CharField(_("昵称"), max_length=64)
     email = models.EmailField(_("Email"), unique=True, blank=True, null=True)
     phone = models.CharField(_("手机号"), max_length=32, blank=True)
@@ -42,11 +48,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_('对 admin/ 管理页的只读权限'),
     )  # for compatibility with Django Admin
 
-    USERNAME_FIELD = 'gid'
+    # It's easier to integrate with DRF by combining the two tables together
+    # real_name_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')
+    # student_id_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')
+    # email_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')
+    # phone_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')
+    # profile_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')
+
+    USERNAME_FIELD = 'student_id'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['student_id']
+    REQUIRED_FIELDS = ['gid']
 
     objects = UserManager()
 
     def get_full_name(self):
-        return f"{self.nick_name} ({self.actual_name}, {self.student_id})"
+        return f"{self.nick_name} ({self.real_name}, {self.student_id})"

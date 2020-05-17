@@ -12,14 +12,16 @@ from urllib.request import urlopen
 from xml.etree import ElementTree
 
 from django.contrib.auth import login, authenticate, logout
+from django.db import transaction
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.conf import settings
-from rest_framework import status
+from rest_framework import status, mixins, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
+from .serializers import UserInfoSerializer
 
 
 class BaseLoginView(APIView):
@@ -45,10 +47,14 @@ class BaseLoginView(APIView):
 
     def login(self, **kwargs):
         if kwargs.get("get_or_create"):
-            user, _ = User.objects.get_or_create(
-                gid=kwargs.get("gid"),
-                student_id=kwargs.get("student_id")
-            )
+            with transaction.atomic:
+                user, created = User.objects.get_or_create(
+                    gid=kwargs.get("gid"),
+                    student_id=kwargs.get("student_id")
+                )
+                if created:
+                    # Visibility(user=user).save()
+                    pass
         else:
             user = User.objects.get(
                 student_id=kwargs.get("username")
@@ -109,3 +115,11 @@ class LogoutView(APIView):
             "msg": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
                    f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
         })
+
+
+class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A simple viewset to show user public information
+    """
+    queryset = User.objects.all()
+    serializer_class = UserInfoSerializer
