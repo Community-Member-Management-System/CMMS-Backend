@@ -10,11 +10,11 @@ Views: 实现了
 - CAS 登录
 - 注销
 - 查看用户公开信息
+- 查看当前用户信息、修改当前用户信息。
 
 TODO:
 
 - 不允许从 CAS 使用 GID 登录。
-- 修改用户信息。
 - 用户信息可见性相关设置（比较复杂）
 
 ## 传统登录
@@ -61,6 +61,12 @@ TODO:
 
 ## 查看用户公开信息
 
-`GET /api/users/`
+`GET /api/users/public/`
+
+详见 Browsable API 页面。
+
+## 查看、修改自己的信息
+
+`GET/PUT/PATCH /api/users/current`
 
 详见 Browsable API 页面。

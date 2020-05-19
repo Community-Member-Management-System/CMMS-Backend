@@ -16,12 +16,12 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.conf import settings
-from rest_framework import status, mixins, viewsets
+from rest_framework import status, mixins, viewsets, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import UserInfoSerializer
+from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer
 from .utils import is_new_user
 
 
@@ -49,14 +49,10 @@ class BaseLoginView(APIView):
 
     def login(self, **kwargs):
         if kwargs.get("get_or_create"):
-            with transaction.atomic:
-                user, created = User.objects.get_or_create(
-                    gid=kwargs.get("gid"),
-                    student_id=kwargs.get("student_id")
-                )
-                if created:
-                    # Visibility(user=user).save()
-                    pass
+            user, created = User.objects.get_or_create(
+                gid=kwargs.get("gid"),
+                student_id=kwargs.get("student_id")
+            )
         else:
             user = User.objects.get(
                 student_id=kwargs.get("username")
@@ -126,4 +122,11 @@ class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
     A simple viewset to show user public information
     """
     queryset = User.objects.all()
-    serializer_class = UserInfoSerializer
+    serializer_class = PublicUserInfoSerializer
+
+
+class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
+    serializer_class = CurrentUserInfoSerializer
+
+    def get_object(self):
+        return self.request.user

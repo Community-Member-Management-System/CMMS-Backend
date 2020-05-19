@@ -5,8 +5,8 @@ from .models import User
 
 class LoginAndLogoutTests(APITestCase):
     def setUp(self):
-        User.objects.create_user(gid="testgid", student_id="teststuid", password="test")
-        User.objects.create_user(gid="gid2", student_id="PB23333333", password="test2", nick_name="myname")
+        User.objects.create_user(gid="testgid", student_id="teststuid", password="test", profile="testprofile")
+        User.objects.create_user(gid="gid2", student_id="PB23333333", password="test2", nick_name="myname", phone="123")
 
     def test_traditional_login_new_user(self):
         url = '/api/auth/traditional_login'
@@ -32,3 +32,32 @@ class LoginAndLogoutTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     # Sadly, CAS Login may be too hard to test.
+
+    def test_get_all_users_info(self):
+        url = '/api/users/public/'
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for i in response.data:
+            if i["pk"] == 1:
+                self.assertEqual(i["profile"], "testprofile")
+            elif i["pk"] == 2:
+                self.assertEqual(i["nick_name"], "myname")
+            self.assertEqual(i.get("real_name"), None)  # not leaking private info
+
+    def test_get_my_info(self):
+        self.test_traditional_login_old_user()
+        url = '/api/users/current'
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["phone"], "123")
+
+        response = self.client.patch(url, {
+            "phone": "4567"
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["phone"], "4567")
