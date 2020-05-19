@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 
 from .models import User
 from .serializers import UserInfoSerializer
+from .utils import is_new_user
 
 
 class BaseLoginView(APIView):
@@ -37,9 +38,10 @@ class BaseLoginView(APIView):
         username = self.request.data.get('username')
         password = self.request.data.get('password')
         if authenticate(self.request, username=username, password=password):
-            self.login(username=username)
+            user = self.login(username=username)
             return Response({
-                "msg": "登录成功。"
+                "msg": "登录成功。",
+                "new": is_new_user(user),
             })
         return Response({
             "msg": "登录失败。"
@@ -60,6 +62,7 @@ class BaseLoginView(APIView):
                 student_id=kwargs.get("username")
             )
         login(self.request, user, self.backend)
+        return user
 
 
 class CASLoginView(BaseLoginView):
@@ -82,9 +85,10 @@ class CASLoginView(BaseLoginView):
         if not self.ticket:
             return redirect(f'{settings.CAS_SERVICE_URL}/login?{urlencode({"service": service})}')
         if self.check_ticket():
-            self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
+            user = self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
             return Response({
-                "msg": "登录成功。"
+                "msg": "登录成功。",
+                "new": is_new_user(user),
             })
         return Response({
             "msg": "登录失败。"

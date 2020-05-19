@@ -13,6 +13,7 @@ class LoginAndLogoutTests(APITestCase):
 
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["new"], True)
 
     def test_failed_traditional_login(self):
         url = '/api/auth/traditional_login'
