@@ -113,6 +113,14 @@ class LogoutView(APIView):
         })
 
 
+class LoginCheckView(APIView):
+    def post(self, request):
+        return Response({
+            "login": request.user.is_authenticated,
+            "new": None if not request.user.is_authenticated else is_new_user(request.user)
+        })
+
+
 class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A simple viewset to show user public information
