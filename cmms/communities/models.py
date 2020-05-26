@@ -21,7 +21,11 @@ class Community(models.Model):
         verbose_name=_('拥有者'),
         related_name='communities_owned',
     )
-    name = models.CharField(max_length=64, verbose_name=_('社团名称'))
+    name = models.CharField(
+        max_length=64,
+        verbose_name=_('社团名称'),
+        unique=True
+    )
     profile = models.TextField(blank=True, verbose_name=_('社团简介'))
     date_created = models.DateTimeField(default=timezone.now, verbose_name=_('创建时间'))
     members = models.ManyToManyField(
