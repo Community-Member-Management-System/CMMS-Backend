@@ -27,3 +27,15 @@ class Notice(models.Model):
     description = models.TextField(verbose_name=_('通知描述'),
                                    blank=True,
                                    null=True)
+
+
+class NoticeBox(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             verbose_name=_('用户'),
+                             null=True)
+    notice = models.ForeignKey(settings.NOTICE_MODEL,
+                               on_delete=models.CASCADE,
+                               verbose_name=_('通知'),
+                               null=True)
+    read = models.BooleanField(default=False, verbose_name=_('已读'))
