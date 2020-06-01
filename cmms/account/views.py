@@ -13,7 +13,7 @@ from xml.etree import ElementTree
 
 from django.contrib.auth import login, authenticate, logout
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
 from rest_framework import status, mixins, viewsets, generics
@@ -82,13 +82,9 @@ class CASLoginView(BaseLoginView):
             return redirect(f'{settings.CAS_SERVICE_URL}/login?{urlencode({"service": service})}')
         if self.check_ticket():
             user = self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
-            return Response({
-                "msg": "登录成功。",
-                "new": is_new_user(user),
-            })
-        return Response({
-            "msg": "登录失败。"
-        }, status=status.HTTP_401_UNAUTHORIZED)
+            return redirect(f"/?login=true&new={'true' if is_new_user(user) else 'false'}")
+        return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
+                            status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
@@ -114,6 +110,14 @@ class LogoutView(APIView):
         return Response({
             "msg": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
                    f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
+        })
+
+
+class LoginCheckView(APIView):
+    def post(self, request):
+        return Response({
+            "login": request.user.is_authenticated,
+            "new": None if not request.user.is_authenticated else is_new_user(request.user)
         })
 
 

@@ -61,3 +61,21 @@ class LoginAndLogoutTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["phone"], "4567")
+
+    def test_login_check(self):
+        url = '/api/auth/check'
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'login': False,
+            'new': None
+        })
+
+        self.test_traditional_login_old_user()
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'login': True,
+            'new': False
+        })
