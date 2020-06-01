@@ -44,3 +44,10 @@
 | ca      | 创建社团审核结果         | 加入社团审核结果 |            |
 | c_ap    | 社团管理员个人邀请被拒绝 | 社团成员权限变更 | 成员增减   |
 
+### NoticeBox
+
++ user
++ notice
++ read
++ deleted
+
