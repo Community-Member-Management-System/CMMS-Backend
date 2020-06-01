@@ -8,11 +8,11 @@ from . import NoticeType
 class Notice(models.Model):
     date = models.DateTimeField(default=timezone.now, verbose_name=_('通知时间'))
     type = models.IntegerField(verbose_name=_('通知类型'))
-    related_user = models.ForeignKey("User",
+    related_user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                      on_delete=models.CASCADE,
                                      verbose_name=_('关联用户'),
                                      null=True)
-    related_community = models.ForeignKey("Community",
+    related_community = models.ForeignKey(settings.COMMUNITY_MODEL,
                                           on_delete=models.CASCADE,
                                           verbose_name=_('关联社团'),
                                           null=True)
