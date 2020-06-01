@@ -1,5 +1,9 @@
 # notice
 
+## idea
+
+- [ ] 用户登陆/刷新/操作 NoticeBox 时懒更新与其有关的 NoticeBox 表项。
+
 ## model
 
 ### Notice
