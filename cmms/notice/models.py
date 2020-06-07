@@ -55,6 +55,7 @@ class NoticeBox(models.Model):
                                on_delete=models.CASCADE,
                                verbose_name=_('通知'))
     read = models.BooleanField(default=False, verbose_name=_('已读'))
+    deleted = models.BooleanField(default=False, verbose_name=_('已删除'))
 
     def __str__(self):
         return self.id
