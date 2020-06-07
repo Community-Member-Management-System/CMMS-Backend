@@ -42,6 +42,9 @@ class Notice(models.Model):
                                    blank=True,
                                    null=True)
 
+    def __str__(self):
+        return self.id
+
 
 class NoticeBox(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -52,3 +55,6 @@ class NoticeBox(models.Model):
                                on_delete=models.CASCADE,
                                verbose_name=_('通知'))
     read = models.BooleanField(default=False, verbose_name=_('已读'))
+
+    def __str__(self):
+        return self.id
