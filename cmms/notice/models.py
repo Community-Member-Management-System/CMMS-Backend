@@ -34,7 +34,7 @@ class NoticeBox(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name=_('用户'),
                              null=True)
-    notice = models.ForeignKey(settings.NOTICE_MODEL,
+    notice = models.ForeignKey(Notice,
                                on_delete=models.CASCADE,
                                verbose_name=_('通知'),
                                null=True)

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'account',
     'communities',
+    'notice.apps.NoticeConfig'
 ]
 
 MIDDLEWARE = [
