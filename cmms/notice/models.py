@@ -43,7 +43,7 @@ class Notice(models.Model):
                                    null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class NoticeBox(models.Model):
@@ -58,4 +58,4 @@ class NoticeBox(models.Model):
     deleted = models.BooleanField(default=False, verbose_name=_('已删除'))
 
     def __str__(self):
-        return self.id
+        return str(self.id)
