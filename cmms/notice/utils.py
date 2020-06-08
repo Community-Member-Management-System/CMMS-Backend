@@ -31,9 +31,18 @@ class NoticeManager:
             self.__notice_box_manager.create(staff, notice)
 
     # 创建 Notice 的方法
-    def create_notice_PC(self, related_user, related_community, subtype, date=timezone.now):
+    def create_notice_PC(self,
+                         related_user,
+                         related_community,
+                         subtype,
+                         date=timezone.now):
         type = 'PC'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype)
+        new_notice = self.__notice_manager.create(
+            date=date,
+            type=type,
+            related_user=related_user,
+            related_community=related_community,
+            subtype=subtype)
         self.__create_notice_P(related_user, new_notice)
 
     # TODO: Comment
@@ -42,42 +51,98 @@ class NoticeManager:
     #     new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_comment=related_comment, subtype=subtype)
     #     self.__create_notice_P(related_user, new_notice)
 
-    def create_notice_CA(self, related_user, related_community, subtype, description, date=timezone.now):
+    def create_notice_CA(self,
+                         related_user,
+                         related_community,
+                         subtype,
+                         description,
+                         date=timezone.now):
         type = 'CA'
         if related_community is None:
-            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, subtype=subtype, description=description)
+            new_notice = self.__notice_manager.create(
+                date=date,
+                type=type,
+                related_user=related_user,
+                subtype=subtype,
+                description=description)
         else:
-            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype, description=description)
+            new_notice = self.__notice_manager.create(
+                date=date,
+                type=type,
+                related_user=related_user,
+                related_community=related_community,
+                subtype=subtype,
+                description=description)
         self.__create_notice_P(related_user, new_notice)
 
     def create_notice_B(self, related_user, description, date=timezone.now):
         type = 'B'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, description=description)
+        new_notice = self.__notice_manager.create(date=date,
+                                                  type=type,
+                                                  related_user=related_user,
+                                                  description=description)
         self.__create_notice_P(related_user, new_notice)
 
-    def create_notice_C_AN(self, related_community, description, date=timezone.now):
+    def create_notice_C_AN(self,
+                           related_community,
+                           description,
+                           date=timezone.now):
         type = 'C_AN'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_community=related_community, description=description)
+        new_notice = self.__notice_manager.create(
+            date=date,
+            type=type,
+            related_community=related_community,
+            description=description)
         self.__create_notice_C(related_community, new_notice)
 
-    def create_notice_C_AP(self, related_user, related_community, subtype, description, date=timezone.now):
+    def create_notice_C_AP(self,
+                           related_user,
+                           related_community,
+                           subtype,
+                           description,
+                           date=timezone.now):
         type = 'C_AP'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype, description=description)
+        new_notice = self.__notice_manager.create(
+            date=date,
+            type=type,
+            related_user=related_user,
+            related_community=related_community,
+            subtype=subtype,
+            description=description)
         self.__create_notice_C_A(related_community, new_notice)
 
-    def create_notice_C_AA(self, related_user, related_community, description, date=timezone.now):
+    def create_notice_C_AA(self,
+                           related_user,
+                           related_community,
+                           description,
+                           date=timezone.now):
         type = 'C_AA'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, description=description)
+        new_notice = self.__notice_manager.create(
+            date=date,
+            type=type,
+            related_user=related_user,
+            related_community=related_community,
+            description=description)
         self.__create_notice_C_A(related_community, new_notice)
 
-    def create_notice_C_D(self, related_community, description, date=timezone.now):
+    def create_notice_C_D(self,
+                          related_community,
+                          description,
+                          date=timezone.now):
         type = 'C_D'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_community=related_community, description=description)
+        new_notice = self.__notice_manager.create(
+            date=date,
+            type=type,
+            related_community=related_community,
+            description=description)
         self.__create_notice_C(related_community, new_notice)
 
     def create_notice_S_CA(self, related_user, description, date=timezone.now):
         type = 'S_CA'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, description=description)
+        new_notice = self.__notice_manager.create(date=date,
+                                                  type=type,
+                                                  related_user=related_user,
+                                                  description=description)
         self.__create_notice_S_CA(new_notice)
 
     # 操作 NoticeBox 的方法
