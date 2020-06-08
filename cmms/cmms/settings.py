@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'account',
     'communities',
+    'notice.apps.NoticeConfig'
 ]
 
 MIDDLEWARE = [
@@ -124,6 +125,10 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'account.User'
 COMMUNITY_MODEL = 'communities.Community'
+NOTICE_MODEL = 'notices.Notice'
+
+# TODO: Comment
+# COMMENT_MODEL = ''
 
 CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
 CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
