@@ -46,9 +46,18 @@ class NoticeManager:
         self.__create_notice_P(related_user, new_notice)
 
     # TODO: Comment
-    # def create_notice_AR(self, related_user, related_comment, subtype, date=timezone.now):
+    # def create_notice_AR(self,
+    #                      related_user,
+    #                      related_comment,
+    #                      subtype,
+    #                      date=timezone.now):
     #     type = 'AR'
-    #     new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_comment=related_comment, subtype=subtype)
+    #     new_notice = self.__notice_manager.create(
+    #         date=date,
+    #         type=type,
+    #         related_user=related_user,
+    #         related_comment=related_comment,
+    #         subtype=subtype)
     #     self.__create_notice_P(related_user, new_notice)
 
     def create_notice_CA(self,
