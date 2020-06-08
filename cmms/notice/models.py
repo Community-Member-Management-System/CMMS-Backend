@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-# from . import NoticeType
 
 
 class Notice(models.Model):
@@ -34,7 +33,7 @@ class Notice(models.Model):
                                           blank=True)
 
     # TODO: Comment
-    # related_comment = models.ForeignKey("Comment",
+    # related_comment = models.ForeignKey(COMMENT_MODEL,
     #                                     on_delete=models.CASCADE,
     #                                     verbose_name=_('关联评论'),
     #                                     null=True)
