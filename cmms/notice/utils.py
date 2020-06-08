@@ -42,12 +42,12 @@ class NoticeManager:
     #     new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_comment=related_comment, subtype=subtype)
     #     self.__create_notice_P(related_user, new_notice)
 
-    def create_notice_CA(self, related_user, related_community, subtype, date=timezone.now):
+    def create_notice_CA(self, related_user, related_community, subtype, description, date=timezone.now):
         type = 'CA'
         if related_community is None:
-            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, subtype=subtype)
+            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, subtype=subtype, description=description)
         else:
-            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype)
+            new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype, description=description)
         self.__create_notice_P(related_user, new_notice)
 
     def create_notice_B(self, related_user, description, date=timezone.now):
@@ -60,9 +60,9 @@ class NoticeManager:
         new_notice = self.__notice_manager.create(date=date, type=type, related_community=related_community, description=description)
         self.__create_notice_C(related_community, new_notice)
 
-    def create_notice_C_AP(self, related_user, related_community, subtype, date=timezone.now):
+    def create_notice_C_AP(self, related_user, related_community, subtype, description, date=timezone.now):
         type = 'C_AP'
-        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype)
+        new_notice = self.__notice_manager.create(date=date, type=type, related_user=related_user, related_community=related_community, subtype=subtype, description=description)
         self.__create_notice_C_A(related_community, new_notice)
 
     def create_notice_C_AA(self, related_user, related_community, description, date=timezone.now):
@@ -84,11 +84,11 @@ class NoticeManager:
     def fetch(self, user):
         return self.__notice_box_manager.filter(user=user)
 
-    def read(self, user, notice):
-        self.__notice_box_manager.get(user=user, notice=notice).read = True
+    def read(self, notice_box):
+        notice_box.read = True
 
-    def unread(self, user, notice):
-        self.__notice_box_manager.get(user=user, notice=notice).read = False
+    def unread(self, notice_box):
+        notice_box.read = False
 
-    def delete(self, user, notice):
-        self.__notice_box_manager.get(user=user, notice=notice).delete = True
+    def delete(self, notice_box):
+        notice_box.delete = True
