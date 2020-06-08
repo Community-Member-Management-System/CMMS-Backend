@@ -2,7 +2,8 @@
 
 ## idea
 
-- [ ] 用户登陆/刷新/操作 NoticeBox 时懒更新与其有关的 NoticeBox 表项。
+- [ ] ~~用户登陆/刷新/操作 NoticeBox 时懒更新与其有关的 NoticeBox 表项。~~
+- [ ] Notice 发生时对 Notice 更新，Notice 更新时更新 NoticeBox，用户读 Notice 时从 NoticeBox 取数据。
 
 ## model
 
