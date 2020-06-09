@@ -31,13 +31,10 @@ class Notice(models.Model):
                                           verbose_name=_('关联社团'),
                                           null=True,
                                           blank=True)
-
-    # TODO: Comment
-    # related_comment = models.ForeignKey(COMMENT_MODEL,
-    #                                     on_delete=models.CASCADE,
-    #                                     verbose_name=_('关联评论'),
-    #                                     null=True)
-
+    related_comment = models.ForeignKey(settings.COMMENT_MODEL,
+                                        on_delete=models.CASCADE,
+                                        verbose_name=_('关联评论'),
+                                        null=True)
     subtype = models.IntegerField(verbose_name=_('通知子类型'),
                                   null=True,
                                   blank=True)

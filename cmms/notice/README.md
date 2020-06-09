@@ -23,8 +23,6 @@
 
 日期默认为创建通知时的时间。
 
-> 由于 Comment 还没写，此接口处于注释状态。
-
 #### create_notice_CA(related_user, related_community, subtype, description, date)
 
 创建一个用户 `related_user` 创建 `subtype = 0` /加入 `subtype = 1` 社团 `related_community` 结果 `description` 的通知。若创建失败，社团可以为空 `None` 。

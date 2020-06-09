@@ -9,15 +9,13 @@
 ### Activity
 
 + related_community
-+ date
++ created_date
 + location
 + title
 + description
 + start_time
 + end_time
-+ seed
 + signed_in_users
-+ comments
 
 ### Comment
 
