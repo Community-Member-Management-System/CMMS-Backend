@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'account',
     'communities',
-    'notice.apps.NoticeConfig'
+    'notice.apps.NoticeConfig',
+    'activity.apps.ActivityConfig',
 ]
 
 MIDDLEWARE = [
@@ -125,10 +126,9 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'account.User'
 COMMUNITY_MODEL = 'communities.Community'
-NOTICE_MODEL = 'notices.Notice'
-
-# TODO: Comment
-# COMMENT_MODEL = ''
+NOTICE_MODEL = 'notice.Notice'
+ACTIVITY_MODEL = 'activity.Activity'
+COMMENT_MODEL = 'activity.Comment'
 
 CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
 CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
