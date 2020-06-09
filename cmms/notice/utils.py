@@ -10,8 +10,7 @@ class NoticeManager:
 
     # 暂时没用
     # __community_manager = settings.COMMUNITY_MODEL.objects
-
-    __comment_manager = settings.COMMENT_MODEL.objects
+    # __comment_manager = settings.COMMENT_MODEL.objects
 
     # 分类对 NoticeBox 更新
     def __create_notice_P(self, user, notice):
