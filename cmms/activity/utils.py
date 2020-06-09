@@ -30,8 +30,14 @@ class ActivityManager:
         return self.__activity_manager.filter(related_community=community)
 
     # Comment API
-    def create_comment(self, related_activity, related_user, title, content, date=timezone.now):
-        return self.__comment_manager.create(related_activity, related_user, date, title, content)
+    def create_comment(self,
+                       related_activity,
+                       related_user,
+                       title,
+                       content,
+                       date=timezone.now):
+        return self.__comment_manager.create(related_activity, related_user,
+                                             date, title, content)
 
     def get_comment_by_activity(self, activity):
         return self.__comment_manager.filter(related_activity=activity)
