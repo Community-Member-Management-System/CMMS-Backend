@@ -4,10 +4,10 @@ from django.utils import timezone
 
 
 class ActivityManager:
-    __user_manager = settings.AUTH_USER_MODEL.objects
-    __community_manager = settings.COMMUNITY_MODEL.objects
-    __notice_manager = settings.NOTICE_MODEL.objects
-    __notice_box_manager = settings.NOTICE_BOX_MODEL.objects
+    # __user_manager = settings.AUTH_USER_MODEL.objects
+    # __community_manager = settings.COMMUNITY_MODEL.objects
+    # __notice_manager = settings.NOTICE_MODEL.objects
+    # __notice_box_manager = settings.NOTICE_BOX_MODEL.objects
     __activity_manager = Activity.objects
     __comment_manager = Comment.objects
 

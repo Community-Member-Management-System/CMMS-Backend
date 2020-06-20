@@ -6,7 +6,7 @@ from django.utils import timezone
 class NoticeManager:
     __notice_manager = Notice.objects
     __notice_box_manager = NoticeBox.objects
-    __user_manager = settings.AUTH_USER_MODEL.objects
+    # __user_manager = settings.AUTH_USER_MODEL.objects
 
     # 暂时没用
     # __community_manager = settings.COMMUNITY_MODEL.objects
@@ -24,9 +24,10 @@ class NoticeManager:
         for admin in community.admins.all():
             self.__notice_box_manager.create(admin, notice)
 
-    def __create_notice_S(self, notice):
-        for staff in self.__user_manager.filter(is_staff=True):
-            self.__notice_box_manager.create(staff, notice)
+    # TODO: current solution is wrong, support from user module is needed.
+    # def __create_notice_S(self, notice):
+    #     for staff in self.__user_manager.filter(is_staff=True):
+    #         self.__notice_box_manager.create(staff, notice)
 
     # 创建 Notice 的方法
     def create_notice_PC(self,
