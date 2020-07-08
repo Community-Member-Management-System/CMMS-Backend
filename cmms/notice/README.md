@@ -19,9 +19,13 @@
 
 ### 请求通知内容
 
-`GET /api/notice/notice_pk`
+`POST /api/notice/access`
 
-输入：无
+输入：
+
+| 字段 | 备注 |
+| -- | -- |
+| notice | 通知主键 |
 
 输出：
 

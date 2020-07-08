@@ -18,10 +18,10 @@ class NoticeList(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# Notice detail is currently designed as fetch by pk. More elegant solution may be needed.
 class NoticeDetail(APIView):
-    def get(self, request, pk, format=None):
+    def post(self, request, format=None):
         user = request.user
+        pk = request.data.get('notice')
         if user.is_authenticated:
             notice = notice_namager.access(user, pk)
             serializer = NoticeSerializer(notice)
