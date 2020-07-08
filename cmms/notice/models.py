@@ -34,7 +34,8 @@ class Notice(models.Model):
     related_comment = models.ForeignKey(settings.COMMENT_MODEL,
                                         on_delete=models.CASCADE,
                                         verbose_name=_('关联评论'),
-                                        null=True)
+                                        null=True,
+                                        blank=True)
     subtype = models.IntegerField(verbose_name=_('通知子类型'),
                                   null=True,
                                   blank=True)

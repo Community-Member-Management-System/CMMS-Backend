@@ -1,6 +1,7 @@
 from .models import Notice, NoticeBox
 from django.conf import settings
 from django.utils import timezone
+from django.http import Http404
 
 
 class NoticeManager:
@@ -164,3 +165,16 @@ class NoticeManager:
 
     def delete(self, notice_box):
         notice_box.delete = True
+
+    def access(self, user, notice_pk):
+        try:
+            notice = Notice.objects.get(pk=notice_pk)
+            if self.__notice_box_manager.filter(user=user, notice=notice).count() == 0:
+                raise Http404
+            else:
+                return notice
+        except Notice.DoesNotExist:
+            raise Http404
+
+
+notice_namager = NoticeManager()
