@@ -4,7 +4,7 @@
 
 ### 请求通知列表
 
-`GET /api/notice/`
+`GET /api/notice`
 
 输入：无
 
@@ -19,7 +19,7 @@
 
 ### 请求通知内容
 
-`POST /api/notice/access`
+`POST /api/notice`
 
 输入：
 
@@ -89,4 +89,3 @@
 + notice
 + read
 + deleted
-

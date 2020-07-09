@@ -7,7 +7,7 @@ from rest_framework import status
 from django.contrib.auth.decorators import login_required
 
 
-class NoticeList(APIView):
+class NoticeView(APIView):
     def get(self, request, format=None):
         user = request.user
         if user.is_authenticated:
@@ -17,8 +17,6 @@ class NoticeList(APIView):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-class NoticeDetail(APIView):
     def post(self, request, format=None):
         user = request.user
         pk = request.data.get('notice')
