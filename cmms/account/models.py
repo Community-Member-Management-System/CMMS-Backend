@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     student_id = models.CharField(_("学号"), max_length=10, unique=True)
     real_name = models.CharField(_("真实姓名"), max_length=16)
     nick_name = models.CharField(_("昵称"), max_length=64)
-    email = models.EmailField(_("Email"), unique=True, blank=True, null=True)
+    email = models.EmailField(_("Email"), unique=True, null=True)
     phone = models.CharField(_("手机号"), max_length=32, blank=True)
     profile = models.TextField(_("个人简介"), blank=True)
     avatar_url = models.URLField(_("头像"), blank=True)

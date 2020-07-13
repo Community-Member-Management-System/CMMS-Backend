@@ -136,6 +136,7 @@ class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
+    permission_classes = []
     serializer_class = CurrentUserInfoSerializer
 
     def get_object(self):
