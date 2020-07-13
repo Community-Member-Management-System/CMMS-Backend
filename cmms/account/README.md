@@ -85,3 +85,23 @@ TODO:
 `GET/PUT/PATCH /api/users/current`
 
 详见 Browsable API 页面。
+
+## 关于 `account.utils.ValidUserPermission`
+
+这个 Permission 用于判断用户是否补充了自己的信息（昵称和真实姓名），目前在 `settings.py` 中作为继承了 APIView 的默认 Permission 之一（另一个是判断是否登录了的）。
+
+如果没有补充，默认访问会返回：
+
+```
+HTTP 403 Forbidden
+
+{
+    "detail": "需要补充用户信息（昵称与真实姓名）以使用剩余的功能。"
+}
+```
+
+如果接口是任意用户均可访问的，那么在 APIView 类中设置：
+
+```python
+permission_classes = []
+```

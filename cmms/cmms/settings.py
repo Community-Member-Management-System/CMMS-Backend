@@ -132,3 +132,10 @@ COMMENT_MODEL = 'activity.Comment'
 
 CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
 CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        'account.utils.ValidUserPermission',
+    ],
+}

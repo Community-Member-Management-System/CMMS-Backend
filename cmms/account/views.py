@@ -33,6 +33,7 @@ class BaseLoginView(APIView):
     backend = 'django.contrib.auth.backends.ModelBackend'
     template_name: str
     template_context = None
+    permission_classes = []
 
     def post(self, request):
         username = self.request.data.get('username')
@@ -105,6 +106,8 @@ class CASLoginView(BaseLoginView):
 
 
 class LogoutView(APIView):
+    permission_classes = []
+
     def post(self, request):
         logout(request)
         return Response({
@@ -114,6 +117,8 @@ class LogoutView(APIView):
 
 
 class LoginCheckView(APIView):
+    permission_classes = []
+
     def post(self, request):
         return Response({
             "login": request.user.is_authenticated,
@@ -125,6 +130,7 @@ class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A simple viewset to show user public information
     """
+    permission_classes = []
     queryset = User.objects.all()
     serializer_class = PublicUserInfoSerializer
 

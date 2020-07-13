@@ -20,5 +20,7 @@ class ValidUserPermission(permissions.BasePermission):
     A DRF permission, functioning same as valid_user_check()
     See https://www.django-rest-framework.org/api-guide/permissions/
     """
+    message = '需要补充用户信息（昵称与真实姓名）以使用剩余的功能。'
+
     def has_permission(self, request, view):
         return valid_user_check(request.user)
