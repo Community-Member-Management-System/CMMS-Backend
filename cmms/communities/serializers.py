@@ -19,3 +19,10 @@ class OwnershipTransferSerializer(ModelSerializer):
     class Meta:
         model = Community
         fields = ['owner']
+
+
+class CommunityDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Community
+        fields = ('name', 'profile')
+

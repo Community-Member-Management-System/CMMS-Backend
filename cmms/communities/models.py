@@ -50,3 +50,4 @@ class Membership(models.Model):
         verbose_name=_('社团'),
     )
     date_joined = models.DateTimeField(default=timezone.now, verbose_name=_('加入时间'))
+    valid = models.BooleanField(default=False, verbose_name=_('是否通过审核'))
