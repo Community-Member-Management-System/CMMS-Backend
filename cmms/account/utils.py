@@ -1,4 +1,6 @@
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
+
 from .models import User
 
 
@@ -24,3 +26,15 @@ class ValidUserPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return valid_user_check(request.user)
+
+
+class ValidUserOrReadOnlyPermission(permissions.BasePermission):
+    message = '需要补充用户信息（昵称与真实姓名）以进行修改。'
+
+    def has_permission(self, request, view):
+        return bool(
+            request.method in SAFE_METHODS or
+            request.user and
+            request.user.is_authenticated and
+            valid_user_check(request.user)
+        )
