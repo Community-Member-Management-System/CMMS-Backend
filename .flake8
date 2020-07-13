@@ -1,7 +1,8 @@
 [flake8]
 # https://lintlyci.github.io/Flake8Rules
 ignore =
-    F401
+    F401,
+    W504
 exclude =
     .git,
     .idea,

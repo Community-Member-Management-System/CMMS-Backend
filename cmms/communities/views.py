@@ -9,7 +9,8 @@ from django.db import transaction
 
 from account.utils import ValidUserOrReadOnlyPermission
 
-from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunityDetailSerializer, CommunityJoinSerializer
+from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunityDetailSerializer, \
+    CommunityJoinSerializer
 from .permissions import IsOwnerOrReadOnly
 from .models import Community
 
