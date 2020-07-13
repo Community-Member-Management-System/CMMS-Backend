@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, BooleanField, Serializer
 from rest_framework.exceptions import ValidationError
 
 from .models import Community
@@ -26,3 +26,6 @@ class CommunityDetailSerializer(ModelSerializer):
         model = Community
         fields = ('name', 'profile')
 
+
+class CommunityJoinSerializer(Serializer):
+    join = BooleanField(label='加入', required=True, read_only=False)

@@ -51,3 +51,8 @@ class Membership(models.Model):
     )
     date_joined = models.DateTimeField(default=timezone.now, verbose_name=_('加入时间'))
     valid = models.BooleanField(default=False, verbose_name=_('是否通过审核'))
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'community'], name='user_community_unique')
+        ]
