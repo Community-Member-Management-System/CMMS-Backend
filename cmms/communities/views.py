@@ -15,7 +15,6 @@ from .permissions import IsOwnerOrReadOnly, IsAdmin
 from .models import Community
 
 
-# Create your views here.
 class CommunityListView(generics.ListCreateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
     serializer_class = CommunitySerializer
