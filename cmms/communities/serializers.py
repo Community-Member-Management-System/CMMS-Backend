@@ -1,6 +1,7 @@
-from rest_framework.serializers import ModelSerializer, BooleanField, Serializer
+from rest_framework.serializers import ModelSerializer, BooleanField, Serializer, SerializerMethodField
 from rest_framework.exceptions import ValidationError
 
+from account.models import User
 from .models import Community
 
 
@@ -29,3 +30,22 @@ class CommunityDetailSerializer(ModelSerializer):
 
 class CommunityJoinSerializer(Serializer):
     join = BooleanField(label='加入', required=True, read_only=False)
+
+
+class MemberSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'real_name', 'nick_name')
+
+
+class CommunityNewMemberAuditSerializer(ModelSerializer):
+    invalid_members = SerializerMethodField()
+
+    def get_invalid_members(self, community):
+        invalid_list = community.members.filter(membership__valid=False)
+        serializer = MemberSerializer(instance=invalid_list, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Community
+        fields = ('invalid_members',)
