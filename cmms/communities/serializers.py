@@ -6,6 +6,13 @@ from .models import Community
 
 
 class CommunitySerializer(ModelSerializer):
+    members = SerializerMethodField()
+
+    def get_members(self, community):
+        valid_members = community.members.filter(membership__valid=True)
+        serializer = MemberSerializer(instance=valid_members, many=True)
+        return serializer.data
+
     class Meta:
         model = Community
         fields = '__all__'
@@ -42,6 +49,7 @@ class CommunityNewMemberAuditSerializer(ModelSerializer):
     invalid_members = SerializerMethodField()
 
     def get_invalid_members(self, community):
+        # fixme: dup code
         invalid_list = community.members.filter(membership__valid=False)
         serializer = MemberSerializer(instance=invalid_list, many=True)
         return serializer.data
