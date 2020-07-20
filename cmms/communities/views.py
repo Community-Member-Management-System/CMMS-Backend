@@ -13,6 +13,7 @@ from .serializers import CommunitySerializer, OwnershipTransferSerializer, Commu
     CommunityJoinSerializer, CommunityNewMemberAuditSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin
 from .models import Community
+from notice.utils import NoticeManager
 
 
 class CommunityListView(generics.ListCreateAPIView):
@@ -62,6 +63,8 @@ class CommunityJoinView(APIView):
         community = get_object_or_404(Community, pk=pk)
         serializer = CommunityJoinSerializer(data=request.data)
         if serializer.is_valid():
+            NoticeManager.create_notice_C_AA(self.request.user, community)
+
             # fixme: put following validation logic into serializer
             # maybe serializers.SerializerMethodField() is useful here?
             with transaction.atomic():

@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('', views.NoticeView.as_view()),
+    # path('test', views.Test.as_view()),
 ]

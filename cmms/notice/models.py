@@ -17,7 +17,10 @@ class Notice(models.Model):
         ('S_CA', 'System_CommunityAuditNotice'),
     ]
 
-    date = models.DateTimeField(default=timezone.now, verbose_name=_('通知时间'))
+    date = models.DateTimeField(default=timezone.now,
+                                verbose_name=_('通知时间'),
+                                null=True,
+                                blank=True)
     type = models.CharField(max_length=4,
                             choices=NOTICE_TYPE_CHOICES,
                             verbose_name=_('通知类型'))

@@ -63,6 +63,8 @@ TODO:
 
 发送内容中如果 `join=true`，加入社团；否则如果 `join=false`，退出社团。
 
+notice: 若后续开发需要，`description` 字段可用作附加消息（例如申请理由）。
+
 ## 待审核加入社团列表查询
 
 `GET /api/community/<int:pk>/audit`
