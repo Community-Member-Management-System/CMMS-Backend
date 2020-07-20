@@ -29,6 +29,12 @@ class CommunityListView(generics.ListCreateAPIView):
             community.members.add(self.request.user, through_defaults={'valid': True})
 
 
+class CommunityRetrieveView(generics.RetrieveAPIView):
+    permission_classes = [ValidUserOrReadOnlyPermission]
+    serializer_class = CommunitySerializer
+    queryset = Community.objects.all()
+
+
 class CommunityTransferView(generics.UpdateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
@@ -36,7 +42,7 @@ class CommunityTransferView(generics.UpdateAPIView):
     queryset = Community.objects.all()
 
 
-class CommunityRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     # modify community name & profile
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
@@ -51,29 +57,32 @@ class CommunityDestroyView(generics.DestroyAPIView):
 
 
 class CommunityJoinView(APIView):
-    # retrieve member list, and update it
     permission_classes = [ValidUserOrReadOnlyPermission]
 
     def get(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
-        serializer = CommunitySerializer(community)
-        return Response(serializer.data)
+        return Response(community.get_member_status(request.user))
 
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         serializer = CommunityJoinSerializer(data=request.data)
+        user_status = community.get_member_status(request.user)
         if serializer.is_valid():
-            NoticeManager.create_notice_C_AA(self.request.user, community)
-
             # fixme: put following validation logic into serializer
             # maybe serializers.SerializerMethodField() is useful here?
             with transaction.atomic():
-                admin = community.admins.filter(id=self.request.user.pk)
+                admin = community.admins.filter(id=request.user.pk)
                 if not admin:
                     if serializer.validated_data['join']:
-                        community.members.add(self.request.user)
+                        if user_status['member']:
+                            raise NotAcceptable(f'你目前已经为社团成员 ({"正式" if user_status["valid"] else "待审核"})')
+                        NoticeManager.create_notice_C_AA(request.user, community)
+                        community.members.add(request.user)
                     else:
-                        community.members.remove(self.request.user)
+                        if user_status['member']:
+                            community.members.remove(request.user)
+                        else:
+                            raise NotAcceptable('你不是此社团成员！')
                     return Response(CommunitySerializer(community).data)
                 else:
                     raise NotAcceptable('社团的管理员用户无法直接修改自己的加入状态。')
