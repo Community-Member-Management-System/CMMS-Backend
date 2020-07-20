@@ -63,8 +63,6 @@ class CommunityJoinView(APIView):
         community = get_object_or_404(Community, pk=pk)
         serializer = CommunityJoinSerializer(data=request.data)
         if serializer.is_valid():
-            NoticeManager.create_notice_C_AA(self.request.user, community)
-
             # fixme: put following validation logic into serializer
             # maybe serializers.SerializerMethodField() is useful here?
             with transaction.atomic():
@@ -72,6 +70,8 @@ class CommunityJoinView(APIView):
                 if not admin:
                     if serializer.validated_data['join']:
                         community.members.add(self.request.user)
+
+                        NoticeManager.create_notice_C_AA(self.request.user, community)
                     else:
                         community.members.remove(self.request.user)
                     return Response(CommunitySerializer(community).data)
