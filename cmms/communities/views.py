@@ -83,7 +83,7 @@ class CommunityJoinView(APIView):
                             community.members.remove(request.user)
                         else:
                             raise NotAcceptable('你不是此社团成员！')
-                    return Response(CommunitySerializer(community).data)
+                    return Response(community.get_member_status(request.user))
                 else:
                     raise NotAcceptable('社团的管理员用户无法直接修改自己的加入状态。')
 
