@@ -15,6 +15,13 @@ class ActivityListView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         community = self.request.query_params.get('community', None)
+        only_mine = self.request.query_params.get('only_mine', None)
+        if only_mine is not None and self.request.user.is_authenticated:
+            queryset = Activity.objects.none()
+            for c in self.request.user.communities_joined.all():
+                queryset = c.activity_set.all() | queryset
+            return queryset
+
         if community is None:
             return Activity.objects.all()
         return Activity.objects.filter(related_community__pk=community).all()
