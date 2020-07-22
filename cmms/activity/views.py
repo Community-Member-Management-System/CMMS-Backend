@@ -5,6 +5,7 @@ from .serializers import ActivitySerializer
 from .permissions import IsAdminOrReadOnly
 from .models import Activity
 from account.utils import ValidUserOrReadOnlyPermission
+from notice.utils import NoticeManager
 
 
 # Create your views here.
@@ -25,3 +26,7 @@ class ActivityListView(generics.ListCreateAPIView):
         if community is None:
             return Activity.objects.all()
         return Activity.objects.filter(related_community__pk=community).all()
+
+    def perform_create(self, serializer):
+        activity = serializer.save()
+        NoticeManager.create_notice_C_AN(activity.related_community)  # TODO: Any description?
