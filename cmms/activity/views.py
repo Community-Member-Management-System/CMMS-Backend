@@ -29,4 +29,15 @@ class ActivityListView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         activity = serializer.save()
-        NoticeManager.create_notice_C_AN(activity.related_community)  # TODO: Any description?
+        NoticeManager.create_notice_C_AN(activity.related_community, '新的活动创建')
+
+
+class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ActivitySerializer
+    permission_classes = [IsAdminOrReadOnly,
+                          ValidUserOrReadOnlyPermission]
+    queryset = Activity.objects.all()
+
+    def perform_update(self, serializer):
+        activity = serializer.save()
+        NoticeManager.create_notice_C_AN(activity.related_community, '活动信息已被更新')
