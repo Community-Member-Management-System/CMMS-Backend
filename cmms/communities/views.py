@@ -109,10 +109,20 @@ class CommunityNewMemberAuditActionView(APIView):
             raise NotAcceptable('此成员不在审核列表上。')
 
         member = community.membership_set.get(user_id=user_id)
+        related_user = community.members.get(id=user_id)
+        subtype_ca = 1
+        subtype_c_ap = 2
         if action == 'allow':
+            description = '加入社团请求被通过。'
+            NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
+            NoticeManager.create_notice_C_AP(related_user, community, subtype_c_ap)
+
             member.valid = True
             member.save()
         elif action == 'deny':
+            description = '加入社团请求被拒绝。'
+            NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
+
             member.delete()
         else:
             raise NotAcceptable('错误的操作。')
