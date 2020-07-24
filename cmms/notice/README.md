@@ -12,12 +12,10 @@
 
 | 字段 | 备注 |
 | -- | -- |
-| user | 用户主键 |
-| notice | 通知主键 |
+| pk | NoticeBox 主键 |
 | read | 标记为已读 |
-| delete | 标记为删除 |
 
-### 请求通知内容
+### 请求通知内容/标记为已读/标记为未读/删除
 
 `POST /api/notice`
 
@@ -25,9 +23,12 @@
 
 | 字段 | 备注 |
 | -- | -- |
-| notice | 通知主键 |
+| pk | NoticeBox 主键 |
+| method | 请求方法 |
 
 输出：
+
+#### 默认
 
 | 字段 | 备注 |
 | -- | -- |
@@ -38,6 +39,18 @@
 | related_comment | 关联评论 |
 | subtype | 通知子类型 |
 | description | 通知描述 |
+
+#### `method` 为 `read`
+
+无。会将 NoticeBox 条目的 `read` 属性置为 `True`。
+
+#### `method` 为 `unread`
+
+无。会将 NoticeBox 条目的 `read` 属性置为 `False`。
+
+#### `method` 为 `delete`
+
+无。将不再为该用户的请求返回此通知。
 
 ## model
 

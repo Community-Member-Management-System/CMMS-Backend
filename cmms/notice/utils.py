@@ -1,7 +1,7 @@
 from .models import Notice, NoticeBox
 from django.conf import settings
 from django.utils import timezone
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from account.models import User
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
@@ -12,6 +12,21 @@ class NoticeManager:
     __notice_box_manager = NoticeBox.objects
     __user_manager = User.objects
     __C_AN_subtype_map = {0: '创建了', 1: '更新了', 2: '删除了'}
+
+    # NoticeBox 条目获取和鉴权
+    @classmethod
+    def __get_notice_box(cls, user, pk):
+        object = cls.__notice_box_manager.filter(pk=pk)
+        if object.count() == 0:
+            raise Http404
+        else:
+            object = object.get(pk=pk)
+            if object.user != user:
+                raise Http404
+            elif object.deleted:
+                raise Http404
+            else:
+                return object
 
     # 生成邮件内容
     @classmethod
@@ -166,28 +181,26 @@ class NoticeManager:
     # 操作 NoticeBox 的方法
     @classmethod
     def fetch(cls, user):
-        return cls.__notice_box_manager.filter(user=user)
+        return cls.__notice_box_manager.filter(user=user, deleted=False)
 
     @classmethod
-    def read(cls, notice_box):
-        notice_box.read = True
+    def read(cls, user, pk):
+        object = cls.__get_notice_box(user, pk)
+        object.read = True
+        object.save()
 
     @classmethod
-    def unread(cls, notice_box):
-        notice_box.read = False
+    def unread(cls, user, pk):
+        object = cls.__get_notice_box(user, pk)
+        object.read = False
+        object.save()
 
     @classmethod
-    def delete(cls, notice_box):
-        notice_box.delete = True
+    def delete(cls, user, pk):
+        object = cls.__get_notice_box(user, pk)
+        object.deleted = True
+        object.save()
 
     @classmethod
-    def access(cls, user, notice_pk):
-        try:
-            notice = Notice.objects.get(pk=notice_pk)
-            if cls.__notice_box_manager.filter(user=user,
-                                               notice=notice).count() == 0:
-                raise Http404
-            else:
-                return notice
-        except Notice.DoesNotExist:
-            raise Http404
+    def access(cls, user, pk):
+        return cls.__get_notice_box(user, pk).notice

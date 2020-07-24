@@ -16,21 +16,23 @@ class NoticeView(APIView):
             serializer = NoticeBoxSerializer(notice_list, many=True)
             return Response(serializer.data)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request, format=None):
         user = request.user
-        pk = request.data.get('notice')
+        pk = request.data.get('pk')
+        method = request.data.get('method')
         if user.is_authenticated:
-            notice = NoticeManager.access(user, pk)
-            serializer = NoticeSerializer(notice)
-            return Response(serializer.data)
+            if method == 'read':
+                NoticeManager.read(user, pk)
+            elif method == 'unread':
+                NoticeManager.unread(user, pk)
+            elif method == 'delete':
+                NoticeManager.delete(user, pk)
+            else:
+                notice = NoticeManager.access(user, pk)
+                serializer = NoticeSerializer(notice)
+                return Response(serializer.data)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-# class Test(APIView):
-#     def get(self, request, format=None):
-#         notice = Notice.objects.create(type='B', related_user=request.user)
-#         NoticeBox.objects.create(user=request.user, notice=notice, read=False, deleted=False)
-#         return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_200_OK)
