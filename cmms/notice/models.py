@@ -39,6 +39,11 @@ class Notice(models.Model):
                                         verbose_name=_('关联评论'),
                                         null=True,
                                         blank=True)
+    related_activity = models.ForeignKey(settings.ACTIVITY_MODEL,
+                                         on_delete=models.CASCADE,
+                                         verbose_name=_('关联活动'),
+                                         null=True,
+                                         blank=True)
     subtype = models.IntegerField(verbose_name=_('通知子类型'),
                                   null=True,
                                   blank=True)

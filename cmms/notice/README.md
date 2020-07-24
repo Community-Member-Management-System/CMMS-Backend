@@ -61,26 +61,28 @@
 + related_user
 + related_community
 + related_comment
++ related_activity
 + subtype
 + description
 
-| 类型 | related_user | related_community | related_comment | subtype | description |
-| ---- | ------------ | ----------------- | --------------- | ------- | ----------- |
-| pc   | Y            | Y                 | -               | Y       | -           |
-| ar   | Y            | -                 | Y               | Y       | -           |
-| ca   | Y            | Y/N               | -               | Y       | Y           |
-| b    | Y            | -                 | -               | -       | Y           |
-| c_an | -            | Y                 | -               | -       | Y           |
-| c_ap | Y            | Y                 | -               | Y       | -           |
-| c_aa | Y            | Y                 | -               | -       | Y           |
-| c_d  | -            | Y                 | -               | -       | Y           |
-| s_ca | Y            | -                 | -               | -       | Y           |
+| 类型 | related_user | related_community | related_comment | related_activity | subtype | description |
+| ---- | ------------ | ----------------- | --------------- | ---------------- | ------- | ----------- |
+| pc   | Y            | Y                 | -               | -                | Y       | -           |
+| ar   | Y            | -                 | Y               | -                | Y       | -           |
+| ca   | Y            | Y/N               | -               | -                | Y       | Y           |
+| b    | Y            | -                 | -               | -                | -       | Y           |
+| c_an | -            | -                 | -               | Y                | Y       | -           |
+| c_ap | Y            | Y                 | -               | -                | Y       | -           |
+| c_aa | Y            | Y                 | -               | -                | -       | Y           |
+| c_d  | -            | Y                 | -               | -                | -       | Y           |
+| s_ca | Y            | -                 | -               | -                | -       | Y           |
 
 | subtype | 0                        | 1                | 2          |
 | ------- | ------------------------ | ---------------- | ---------- |
 | pc      | 被邀请加入社团           | 取消管理员       | 被踢出社团 |
 | ar      | 评论被 at                | 评论被回复       |            |
 | ca      | 创建社团审核结果         | 加入社团审核结果 |            |
+| c_an    | 活动创建                 | 活动更新         | 活动删除   |
 | c_ap    | 社团管理员个人邀请被拒绝 | 社团成员权限变更 | 成员增减   |
 
 ### NoticeBox

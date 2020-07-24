@@ -4,12 +4,25 @@ from django.utils import timezone
 from django.http import Http404
 from account.models import User
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
 
 
 class NoticeManager:
     __notice_manager = Notice.objects
     __notice_box_manager = NoticeBox.objects
     __user_manager = User.objects
+    __C_AN_subtype_map = {0: '创建了', 1: '更新了', 2: '删除了'}
+
+    # 生成邮件内容
+    @classmethod
+    def __create_email_subject(cls, community, subtype, title):
+        header = community.name + '社团管理员' + cls.__C_AN_subtype_map[subtype] + '活动：'
+        return settings.DEFAULT_EMAIL_PREFIX + header + title
+
+    @classmethod
+    def __create_email_message(cls, activity):
+        content = '开始时间：' + activity.start_time + '\n结束时间：' + activity.end_time + '\n活动地点：' + activity.location + '\n活动提要：' + activity.description + '\n'
+        return content
 
     # 分类对 NoticeBox 更新
     @classmethod
@@ -82,13 +95,20 @@ class NoticeManager:
         cls.__create_notice_P(related_user, new_notice)
 
     @classmethod
-    def create_notice_C_AN(cls, related_community, description=''):
+    def create_notice_C_AN(cls, related_activity, subtype, if_send_mail=False):
         type = 'C_AN'
+        related_community = related_activity.related_community
         new_notice = cls.__notice_manager.create(
             type=type,
-            related_community=related_community,
-            description=description)
+            related_activity=related_activity,
+            subtype=subtype)
         cls.__create_notice_C(related_community, new_notice)
+
+        if settings.ENABLE_EMAIL and if_send_mail:
+            subject = cls.__create_email_subject(related_community, subtype, related_activity.title)
+            message = cls.__create_email_message(related_activity)
+            recipient_list = [member.email for member in related_community.members.all()]
+            send_mail(subject=subject, message=message, recipient_list=recipient_list)
 
     @classmethod
     def create_notice_C_AP(cls,

@@ -139,3 +139,16 @@ REST_FRAMEWORK = {
         'account.utils.ValidUserPermission',
     ],
 }
+
+ENABLE_EMAIL = False
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 25
+DEFAULT_EMAIL_PREFIX = '[USTC CMMS] '
+
+# EMAIL_USE_TLS / EMAIL_USE_SSL are mutually exclusive, so only set one of those settings to True.
+
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
