@@ -16,12 +16,17 @@ class NoticeManager:
     # 生成邮件内容
     @classmethod
     def __create_email_subject(cls, community, subtype, title):
-        header = community.name + '社团管理员' + cls.__C_AN_subtype_map[subtype] + '活动：'
+        header = community.name + '社团管理员' + cls.__C_AN_subtype_map[
+            subtype] + '活动：'
         return settings.DEFAULT_EMAIL_PREFIX + header + title
 
     @classmethod
     def __create_email_message(cls, activity):
-        content = '开始时间：' + activity.start_time + '\n结束时间：' + activity.end_time + '\n活动地点：' + activity.location + '\n活动提要：' + activity.description + '\n'
+        content = '开始时间：' + activity.start_time \
+            + '\n结束时间：' + activity.end_time \
+            + '\n活动地点：' + activity.location \
+            + '\n活动提要：' + activity.description \
+            + '\n'
         return content
 
     # 分类对 NoticeBox 更新
@@ -99,16 +104,19 @@ class NoticeManager:
         type = 'C_AN'
         related_community = related_activity.related_community
         new_notice = cls.__notice_manager.create(
-            type=type,
-            related_activity=related_activity,
-            subtype=subtype)
+            type=type, related_activity=related_activity, subtype=subtype)
         cls.__create_notice_C(related_community, new_notice)
 
         if settings.ENABLE_EMAIL and if_send_mail:
-            subject = cls.__create_email_subject(related_community, subtype, related_activity.title)
+            subject = cls.__create_email_subject(related_community, subtype,
+                                                 related_activity.title)
             message = cls.__create_email_message(related_activity)
-            recipient_list = [member.email for member in related_community.members.all()]
-            send_mail(subject=subject, message=message, recipient_list=recipient_list)
+            recipient_list = [
+                member.email for member in related_community.members.all()
+            ]
+            send_mail(subject=subject,
+                      message=message,
+                      recipient_list=recipient_list)
 
     @classmethod
     def create_notice_C_AP(cls,
