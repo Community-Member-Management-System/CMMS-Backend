@@ -36,6 +36,7 @@ class Community(models.Model):
         related_name='communities_joined',
     )
     admins = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('管理员'))
+    valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
     def get_member_status(self, user):
         """
@@ -67,7 +68,7 @@ class Membership(models.Model):
         verbose_name=_('社团'),
     )
     date_joined = models.DateTimeField(default=timezone.now, verbose_name=_('加入时间'))
-    valid = models.BooleanField(default=False, verbose_name=_('是否通过审核'))
+    valid = models.BooleanField(default=False, verbose_name=_('成员是否通过审核'))
 
     class Meta:
         constraints = [

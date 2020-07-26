@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, mixins, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
@@ -7,10 +7,10 @@ from rest_framework.exceptions import NotAcceptable
 
 from django.db import transaction
 
-from account.utils import ValidUserOrReadOnlyPermission
+from account.utils import ValidUserOrReadOnlyPermission, IsSuperUser
 
 from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunityDetailSerializer, \
-    CommunityJoinSerializer, CommunityNewMemberAuditSerializer
+    CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin
 from .models import Community
 from notice.utils import NoticeManager
@@ -32,14 +32,14 @@ class CommunityListView(generics.ListCreateAPIView):
 class CommunityRetrieveView(generics.RetrieveAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
     serializer_class = CommunitySerializer
-    queryset = Community.objects.all()
+    queryset = Community.objects.filter(valid=True)
 
 
 class CommunityTransferView(generics.UpdateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
     serializer_class = OwnershipTransferSerializer
-    queryset = Community.objects.all()
+    queryset = Community.objects.filter(valid=True)
 
 
 class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
@@ -47,7 +47,7 @@ class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
     serializer_class = CommunityDetailSerializer
-    queryset = Community.objects.all()
+    queryset = Community.objects.filter(valid=True)
 
 
 class CommunityDestroyView(generics.DestroyAPIView):
@@ -60,11 +60,11 @@ class CommunityJoinView(APIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
 
     def get(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
+        community = get_object_or_404(Community, pk=pk, valid=True)
         return Response(community.get_member_status(request.user))
 
     def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
+        community = get_object_or_404(Community, pk=pk, valid=True)
         serializer = CommunityJoinSerializer(data=request.data)
         user_status = community.get_member_status(request.user)
         if serializer.is_valid():
@@ -92,7 +92,7 @@ class CommunityJoinView(APIView):
 
 class CommunityNewMemberAuditView(generics.RetrieveAPIView):
     permission_classes = [IsAdmin]
-    queryset = Community.objects.all()
+    queryset = Community.objects.filter(valid=True)
     serializer_class = CommunityNewMemberAuditSerializer
 
 
@@ -100,7 +100,7 @@ class CommunityNewMemberAuditActionView(APIView):
     permission_classes = [IsAdmin]
 
     def post(self, request, pk, user_id, action):
-        community = get_object_or_404(Community, pk=pk)
+        community = get_object_or_404(Community, pk=pk, valid=True)
         self.check_object_permissions(request, community)
 
         if community.members.filter(id=user_id, membership__valid=True):
@@ -128,3 +128,24 @@ class CommunityNewMemberAuditActionView(APIView):
             raise NotAcceptable('错误的操作。')
 
         return Response(CommunityNewMemberAuditSerializer(community).data)
+
+
+class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
+                                    mixins.UpdateModelMixin,
+                                    mixins.RetrieveModelMixin,
+                                    viewsets.GenericViewSet):
+    permission_classes = [IsSuperUser]
+    serializer_class = CommunitySysAdminAuditSerializer
+    queryset = Community.objects.all()
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            status = serializer.validated_data['valid']
+            community = self.get_object()
+            owner = community.owner
+            name = community.name
+            serializer.save()
+            NoticeManager.create_notice_S_CA(
+                owner,
+                description=f'你的社团 {name} {"目前已经审核通过" if status else "未通过审核。"}'
+            )

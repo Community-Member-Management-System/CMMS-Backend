@@ -16,7 +16,7 @@ class CommunitySerializer(ModelSerializer):
     class Meta:
         model = Community
         fields = '__all__'
-        read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins']
+        read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins', 'valid']
 
 
 class OwnershipTransferSerializer(ModelSerializer):
@@ -57,3 +57,10 @@ class CommunityNewMemberAuditSerializer(ModelSerializer):
     class Meta:
         model = Community
         fields = ('invalid_members',)
+
+
+class CommunitySysAdminAuditSerializer(ModelSerializer):
+    class Meta:
+        model = Community
+        fields = ('valid', 'name', 'profile', 'owner', 'pk')
+        read_only_fields = ('name', 'profile', 'owner')

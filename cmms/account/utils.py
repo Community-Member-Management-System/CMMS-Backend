@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, IsAdminUser
 
 from .models import User
 
@@ -38,3 +38,8 @@ class ValidUserOrReadOnlyPermission(permissions.BasePermission):
             request.user.is_authenticated and
             valid_user_check(request.user)
         )
+
+
+class IsSuperUser(IsAdminUser):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_superuser)
