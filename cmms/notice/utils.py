@@ -176,7 +176,7 @@ class NoticeManager:
         new_notice = cls.__notice_manager.create(type=type,
                                                  related_user=related_user,
                                                  description=description)
-        cls.__create_notice_S_CA(new_notice)
+        cls.__create_notice_S(new_notice)
 
     # 操作 NoticeBox 的方法
     @classmethod
