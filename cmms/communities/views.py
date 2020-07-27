@@ -27,6 +27,10 @@ class CommunityListView(generics.ListCreateAPIView):
                                         owner=self.request.user)
             community.admins.add(self.request.user)
             community.members.add(self.request.user, through_defaults={'valid': True})
+            NoticeManager.create_notice_S_CA(
+                related_user=self.request.user,
+                description=f'用户 {self.request.user} 申请创建社团 {community.name}'
+            )
 
 
 class CommunityRetrieveView(generics.RetrieveAPIView):
@@ -145,7 +149,9 @@ class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
             owner = community.owner
             name = community.name
             serializer.save()
-            NoticeManager.create_notice_S_CA(
-                owner,
+            NoticeManager.create_notice_CA(
+                related_user=owner,
+                related_community=community,
+                subtype=0,
                 description=f'你的社团 {name} {"目前已经审核通过" if status else "未通过审核。"}'
             )
