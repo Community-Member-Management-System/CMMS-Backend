@@ -3,8 +3,22 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+from account.models import User
+import sys
 
-# Create your models here.
+if sys.version_info >= (3, 8):
+    # well, mypy cannot recognize try-except ImportError...
+    from typing import TypedDict  # type: ignore
+else:
+    from typing_extensions import TypedDict
+
+
+MemberStatusDictType = TypedDict('MemberStatusDictType', {
+    'member': bool,
+    'valid': bool
+})
+
+
 class Community(models.Model):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -38,7 +52,7 @@ class Community(models.Model):
     admins = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('管理员'))
     valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
-    def get_member_status(self, user):
+    def get_member_status(self, user: User) -> MemberStatusDictType:
         """
         判断某个用户在社团中的情况。
         :param user: 一般为 request.user

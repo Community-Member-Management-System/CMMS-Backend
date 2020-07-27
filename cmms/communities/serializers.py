@@ -1,6 +1,8 @@
 from rest_framework.serializers import ModelSerializer, BooleanField, Serializer, SerializerMethodField
 from rest_framework.exceptions import ValidationError
 
+from django.db.models.query import QuerySet
+
 from account.models import User
 from .models import Community, Invitation
 
@@ -66,7 +68,7 @@ class CommunitySysAdminAuditSerializer(ModelSerializer):
         read_only_fields = ('name', 'profile', 'owner')
 
 
-def get_community_non_members_list(community):
+def get_community_non_members_list(community) -> 'QuerySet[User]':
     users = User.objects.all()
     members = community.members.all()
     return users.difference(members)

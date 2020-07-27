@@ -4,11 +4,11 @@ from rest_framework.permissions import SAFE_METHODS, IsAdminUser
 from .models import User
 
 
-def is_new_user(user: User):
+def is_new_user(user: User) -> bool:
     return not user.nick_name and not user.real_name
 
 
-def valid_user_check(user: User):
+def valid_user_check(user: User) -> bool:
     """
     Use with user_passes_test() or UserPassesTestMixin.
     It is extendable, as it's possible that a user may accept ToS to continue using our service in the future.

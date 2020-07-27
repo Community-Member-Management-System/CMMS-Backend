@@ -50,7 +50,7 @@ class BaseLoginView(APIView):
             "msg": "登录失败。"
         }, status=status.HTTP_401_UNAUTHORIZED)
 
-    def login(self, **kwargs):
+    def login(self, **kwargs) -> User:
         if kwargs.get("get_or_create"):
             user, created = User.objects.get_or_create(
                 gid=kwargs.get("gid"),
@@ -93,7 +93,7 @@ class CASLoginView(BaseLoginView):
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
 
-    def check_ticket(self):
+    def check_ticket(self) -> bool:
         if not settings.CAS_PROXY_PAGE:
             service = urlencode({'service': self.service, 'ticket': self.ticket})
         else:
@@ -103,9 +103,14 @@ class CASLoginView(BaseLoginView):
         cas = '{http://www.yale.edu/tp/cas}'
         if tree.tag != cas + 'authenticationSuccess':
             return False
-        self.gid = tree.find('attributes').find(cas + 'gid').text.strip()
-        self.student_id = tree.find(cas + 'user').text.strip()
-        return True
+        try:
+            # let mypy ignores here, as we have try-except AttributeError
+            self.gid = tree.find('attributes').find(cas + 'gid').text.strip()  # type: ignore
+            self.student_id = tree.find(cas + 'user').text.strip()  # type: ignore
+            return True
+        except AttributeError:
+            # there's something wrong with ElementTree.find()
+            return False
 
 
 class LogoutView(APIView):
