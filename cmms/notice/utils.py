@@ -52,7 +52,9 @@ class NoticeManager:
     @classmethod
     def __create_notice_C(cls, community, notice):
         for member in community.members.all():
-            cls.__notice_box_manager.create(user=member, notice=notice)
+            user_status = community.get_member_status(member)
+            if user_status['valid']:
+                cls.__notice_box_manager.create(user=member, notice=notice)
 
     @classmethod
     def __create_notice_C_A(cls, community, notice):
