@@ -7,6 +7,7 @@ This following code about CAS and traditional login is modified from ustclug/hac
 
 cas.html (CAS_PROXY_PAGE) is from https://github.com/zzh1996/ustccas-revproxy/blob/master/cas_redirect.html
 """
+from typing import List, Sequence, Type
 from urllib.parse import urlencode
 from urllib.request import urlopen
 from xml.etree import ElementTree
@@ -16,7 +17,8 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
-from rest_framework import status, mixins, viewsets, generics
+from rest_framework import status, mixins, viewsets, generics, permissions
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,7 +35,7 @@ class BaseLoginView(APIView):
     backend = 'django.contrib.auth.backends.ModelBackend'
     template_name: str
     template_context = None
-    permission_classes = []
+    permission_classes: Sequence[Type[BasePermission]] = []
 
     def post(self, request):
         username = self.request.data.get('username')
@@ -48,7 +50,7 @@ class BaseLoginView(APIView):
             "msg": "登录失败。"
         }, status=status.HTTP_401_UNAUTHORIZED)
 
-    def login(self, **kwargs):
+    def login(self, **kwargs) -> User:
         if kwargs.get("get_or_create"):
             user, created = User.objects.get_or_create(
                 gid=kwargs.get("gid"),
@@ -71,6 +73,7 @@ class CASLoginView(BaseLoginView):
     ticket: str
     gid: str
     student_id: str
+    permission_classes: Sequence[Type[BasePermission]] = []
 
     def get(self, request):
         self.service = request.build_absolute_uri()
@@ -90,7 +93,7 @@ class CASLoginView(BaseLoginView):
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
 
-    def check_ticket(self):
+    def check_ticket(self) -> bool:
         if not settings.CAS_PROXY_PAGE:
             service = urlencode({'service': self.service, 'ticket': self.ticket})
         else:
@@ -100,13 +103,18 @@ class CASLoginView(BaseLoginView):
         cas = '{http://www.yale.edu/tp/cas}'
         if tree.tag != cas + 'authenticationSuccess':
             return False
-        self.gid = tree.find('attributes').find(cas + 'gid').text.strip()
-        self.student_id = tree.find(cas + 'user').text.strip()
-        return True
+        try:
+            # let mypy ignores here, as we have try-except AttributeError
+            self.gid = tree.find('attributes').find(cas + 'gid').text.strip()  # type: ignore
+            self.student_id = tree.find(cas + 'user').text.strip()  # type: ignore
+            return True
+        except AttributeError:
+            # there's something wrong with ElementTree.find()
+            return False
 
 
 class LogoutView(APIView):
-    permission_classes = []
+    permission_classes: Sequence[Type[BasePermission]] = []
 
     def post(self, request):
         logout(request)
@@ -117,7 +125,7 @@ class LogoutView(APIView):
 
 
 class LoginCheckView(APIView):
-    permission_classes = []
+    permission_classes: Sequence[Type[BasePermission]] = []
 
     def post(self, request):
         return Response({
@@ -130,14 +138,14 @@ class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A simple viewset to show user public information
     """
-    permission_classes = []
+    permission_classes: Sequence[Type[BasePermission]] = []
     queryset = User.objects.all()
     serializer_class = PublicUserInfoSerializer
 
 
 class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
-    permission_classes = []
     serializer_class = CurrentUserInfoSerializer
+    permission_classes: Sequence[Type[BasePermission]] = []
 
     def get_object(self):
         return self.request.user
