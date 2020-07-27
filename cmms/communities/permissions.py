@@ -9,6 +9,16 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.owner == request.user and obj.valid is True
 
 
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user and obj.valid is True
+
+
+class IsUser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
+
+
 class IsAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         found = obj.admins.filter(id=request.user.pk)

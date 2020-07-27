@@ -74,3 +74,16 @@ class Membership(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'community'], name='user_community_unique')
         ]
+
+
+class Invitation(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name=_('用户')
+    )
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.CASCADE,
+        verbose_name=_('社团'),
+    )

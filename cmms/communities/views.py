@@ -1,18 +1,21 @@
 from rest_framework import generics, status, mixins, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAcceptable
+from rest_framework.exceptions import NotAcceptable, APIException
 
 from django.db import transaction
 
+from account.models import User
 from account.utils import ValidUserOrReadOnlyPermission, IsSuperUser
 
 from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunityDetailSerializer, \
-    CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer
-from .permissions import IsOwnerOrReadOnly, IsAdmin
-from .models import Community
+    CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer, \
+    CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer
+from .permissions import IsOwnerOrReadOnly, IsAdmin, IsOwner, IsUser
+from .models import Community, Invitation
 from notice.utils import NoticeManager
 
 
@@ -155,3 +158,64 @@ class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
                 subtype=0,
                 description=f'你的社团 {name} {"目前已经审核通过" if status else "未通过审核。"}'
             )
+
+
+class CommunityAdminInviteView(generics.RetrieveAPIView):
+    permission_classes = [IsAdmin]
+    serializer_class = CommunityInviteSerializer
+    queryset = Community.objects.filter(valid=True)
+
+
+class CommunityAdminSendInvitationView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request, pk, user_id):
+        community = get_object_or_404(Community, pk=pk, valid=True)
+        self.check_object_permissions(request, community)
+        with transaction.atomic():
+            user_list = get_community_non_members_list(community).values_list('id', flat=True)
+            if user_id in user_list:
+                user = User.objects.get(id=user_id)
+                Invitation.objects.create(
+                    user=user,
+                    community=community
+                )
+                NoticeManager.create_notice_PC(
+                    related_user=user,
+                    related_community=community,
+                    subtype=0
+                )
+                return Response('success')  # fixme
+            else:
+                raise NotAcceptable('此用户不在可邀请列表中。')
+
+
+class CommunityUserInvitationViewSet(mixins.ListModelMixin,
+                                     mixins.RetrieveModelMixin,
+                                     viewsets.GenericViewSet):
+    permission_classes = [IsUser]
+    serializer_class = CommunityInvitationSerializer
+
+    def get_queryset(self):
+        return Invitation.objects.filter(user=self.request.user)
+
+    @action(methods=['post'], detail=True)
+    def accept(self, request, *args, **kwargs):
+        invitation = self.get_object()
+        community = invitation.community
+        with transaction.atomic():
+            community.members.add(invitation.user, through_defaults={'valid': True})
+            invitation.delete()
+        return Response('success')  # fixme
+
+    @action(methods=['post'], detail=True)
+    def deny(self, request, *args, **kwargs):
+        invitation = self.get_object()
+        with transaction.atomic():
+            NoticeManager.create_notice_C_AP(
+                related_user=invitation.user,
+                related_community=invitation.community,
+                subtype=0
+            )
+            invitation.delete()
+        return Response('success')  # fixme

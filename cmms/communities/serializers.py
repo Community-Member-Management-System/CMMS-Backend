@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer, BooleanField, Serializer
 from rest_framework.exceptions import ValidationError
 
 from account.models import User
-from .models import Community
+from .models import Community, Invitation
 
 
 class CommunitySerializer(ModelSerializer):
@@ -64,3 +64,29 @@ class CommunitySysAdminAuditSerializer(ModelSerializer):
         model = Community
         fields = ('valid', 'name', 'profile', 'owner', 'pk')
         read_only_fields = ('name', 'profile', 'owner')
+
+
+def get_community_non_members_list(community):
+    users = User.objects.all()
+    members = community.members.all()
+    return users.difference(members)
+
+
+class CommunityInviteSerializer(ModelSerializer):
+    non_members = SerializerMethodField()
+
+    def get_non_members(self, community):
+        non_members_list = get_community_non_members_list(community)
+        serializer = MemberSerializer(instance=non_members_list, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Community
+        fields = ('non_members',)
+
+
+class CommunityInvitationSerializer(ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = '__all__'
+        read_only_fields = ('user', 'community')
