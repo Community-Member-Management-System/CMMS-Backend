@@ -2,7 +2,8 @@ name: Django CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '**'
   pull_request:
     branches: [ master ]
 
@@ -35,5 +36,6 @@ jobs:
     - name: Run Tests
       working-directory: ./cmms
       run: |
-        flake8 --config=../.flake8
+        flake8
+        mypy .
         python manage.py test
