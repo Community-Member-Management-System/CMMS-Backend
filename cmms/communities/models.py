@@ -19,6 +19,10 @@ MemberStatusDictType = TypedDict('MemberStatusDictType', {
 })
 
 
+def community_avatar_path(instance: 'Community', filename: str) -> str:
+    return f'{instance.id}/{filename}'
+
+
 class Community(models.Model):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -50,6 +54,7 @@ class Community(models.Model):
         related_name='communities_joined',
     )
     admins = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('管理员'))
+    avatar = models.ImageField(upload_to=community_avatar_path, verbose_name=_("头像"), blank=True)
     valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
     def get_member_status(self, user: User) -> MemberStatusDictType:

@@ -34,7 +34,7 @@ class OwnershipTransferSerializer(ModelSerializer):
 class CommunityDetailSerializer(ModelSerializer):
     class Meta:
         model = Community
-        fields = ('name', 'profile')
+        fields = ('name', 'profile', 'avatar')
 
 
 class CommunityJoinSerializer(Serializer):
@@ -44,7 +44,7 @@ class CommunityJoinSerializer(Serializer):
 class MemberSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'real_name', 'nick_name')
+        fields = ('id', 'real_name', 'nick_name', 'avatar')
 
 
 class CommunityNewMemberAuditSerializer(ModelSerializer):
@@ -64,8 +64,8 @@ class CommunityNewMemberAuditSerializer(ModelSerializer):
 class CommunitySysAdminAuditSerializer(ModelSerializer):
     class Meta:
         model = Community
-        fields = ('valid', 'name', 'profile', 'owner', 'pk')
-        read_only_fields = ('name', 'profile', 'owner')
+        fields = ('valid', 'name', 'profile', 'owner', 'avatar', 'pk')
+        read_only_fields = ('name', 'profile', 'owner', 'avatar')
 
 
 def get_community_non_members_list(community) -> 'QuerySet[User]':
