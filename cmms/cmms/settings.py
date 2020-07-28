@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'communities',
     'notice.apps.NoticeConfig',
     'activity.apps.ActivityConfig',
-    'upload',
 ]
 
 MIDDLEWARE = [
