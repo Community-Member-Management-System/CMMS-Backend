@@ -154,5 +154,5 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 
 # uploads
-MEDIA_ROOT = 'uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 MEDIA_URL = '/uploads/'
