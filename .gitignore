@@ -131,3 +131,6 @@ dmypy.json
 # IDEA (PyCharm)
 .idea/
 *.iml
+
+# Upload File
+cmms/uploads/

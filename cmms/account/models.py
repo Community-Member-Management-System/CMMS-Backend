@@ -5,6 +5,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+def user_avatar_path(instance: 'User', filename: str) -> str:
+    return f'{instance.id}/{filename}'
+
+
 class UserManager(BaseUserManager):
     """
     Reference: django.contrib.auth.models.UserManager
@@ -39,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("Email"), unique=True, null=True)
     phone = models.CharField(_("手机号"), max_length=32, blank=True)
     profile = models.TextField(_("个人简介"), blank=True)
-    avatar_url = models.URLField(_("头像"), blank=True)
+    avatar = models.ImageField(upload_to=user_avatar_path, verbose_name=_("头像"), blank=True)
     date_joined = models.DateTimeField(_('注册时间'), default=timezone.now)
     last_login = models.DateTimeField(_('上次登录时间'), blank=True, null=True)
     is_staff = models.BooleanField(
