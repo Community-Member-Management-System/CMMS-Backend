@@ -134,3 +134,6 @@ dmypy.json
 
 # Upload File
 cmms/uploads/
+
+# macOS
+.DS_Store
