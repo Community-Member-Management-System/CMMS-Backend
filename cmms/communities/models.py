@@ -20,7 +20,7 @@ MemberStatusDictType = TypedDict('MemberStatusDictType', {
 
 
 def community_avatar_path(instance: 'Community', filename: str) -> str:
-    return f'{instance.id}/{filename}'
+    return f'community/{instance.id}/{filename}'
 
 
 class Community(models.Model):

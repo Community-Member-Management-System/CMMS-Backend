@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def user_avatar_path(instance: 'User', filename: str) -> str:
-    return f'{instance.id}/{filename}'
+    return f'user/{instance.id}/{filename}'
 
 
 class UserManager(BaseUserManager):
