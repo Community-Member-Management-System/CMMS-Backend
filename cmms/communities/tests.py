@@ -10,7 +10,7 @@ class CommunitiesTests(APITestCase):
                                               profile="testprofile", nick_name="user1", real_name="user11")
         self.user2 = User.objects.create_user(gid="gid2", student_id="PB23333333", password="test2",
                                               nick_name="myname", real_name="myname2")
-        Community.objects.create(creator=self.user1, owner=self.user1, name='club1', profile='thisisclub1')
+        Community.objects.create(creator=self.user1, owner=self.user1, name='club1', profile='thisisclub1', valid=True)
 
     def test_list_community(self):
         url = '/api/community/'
