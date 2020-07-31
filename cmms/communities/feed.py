@@ -4,6 +4,10 @@ from django.db.models.query import QuerySet
 
 
 class CommunityEventCalendarFeed(ICalFeed):
+    product_id = '-//cmms/Activity/CN'
+    timezone = 'Asia/Shanghai'
+    file_name = 'feed.ics'
+
     def get_object(self, request, *args, **kwargs):
         return int(kwargs['pk'])
 
