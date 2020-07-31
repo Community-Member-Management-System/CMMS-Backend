@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from rest_framework.fields import SerializerMethodField
+
 from .models import User
+from communities.models import Community
+from communities.serializers import CommunityDetailSerializer
 
 
 class PublicUserInfoSerializer(serializers.ModelSerializer):
@@ -16,6 +20,13 @@ class CurrentUserInfoSerializer(serializers.ModelSerializer):
     """
     Get current user information
     """
+    communities = SerializerMethodField()
+
+    def get_communities(self, user):
+        user_communities_list = Community.objects.filter(membership__user=user)
+        serializer = CommunityDetailSerializer(user_communities_list, many=True)
+        return serializer.data
+
     class Meta:
         model = User
         exclude = ('gid', 'date_joined', 'last_login', 'is_staff', 'password',
