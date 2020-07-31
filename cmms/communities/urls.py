@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, feed
 from rest_framework.routers import SimpleRouter
 
 router = SimpleRouter()
@@ -19,7 +19,8 @@ urlpatterns = [
     path('<int:pk>/audit/<int:user_id>/<str:action>',
          views.CommunityNewMemberAuditActionView.as_view(), name='new_member_action'),
     path('<int:pk>/invite', views.CommunityAdminInviteView.as_view(), name='invite'),
-    path('<int:pk>/invite/<int:user_id>', views.CommunityAdminSendInvitationView.as_view(), name='send_invitation')
+    path('<int:pk>/invite/<int:user_id>', views.CommunityAdminSendInvitationView.as_view(), name='send_invitation'),
+    path('<int:pk>/feed.ics', feed.CommunityEventCalendarFeed(), name='ics_file'),
 ]
 
 urlpatterns += router.urls
