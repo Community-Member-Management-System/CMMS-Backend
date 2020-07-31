@@ -4,7 +4,7 @@ from rest_framework.fields import SerializerMethodField
 
 from .models import User
 from communities.models import Community
-from communities.serializers import CommunityDetailSerializer
+from communities.serializers import CommunitySimpleSerializer
 
 
 class PublicUserInfoSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class CurrentUserInfoSerializer(serializers.ModelSerializer):
 
     def get_communities(self, user):
         user_communities_list = Community.objects.filter(membership__user=user)
-        serializer = CommunityDetailSerializer(user_communities_list, many=True)
+        serializer = CommunitySimpleSerializer(user_communities_list, many=True)
         return serializer.data
 
     class Meta:

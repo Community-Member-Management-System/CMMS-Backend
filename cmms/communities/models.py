@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from account.models import User
+from typing import Optional
 import sys
 
 if sys.version_info >= (3, 8):
@@ -73,6 +74,13 @@ class Community(models.Model):
             'member': member,
             'valid': valid
         }
+
+    def is_admin(self, user: Optional[User]) -> bool:
+        if user is None:
+            return False
+        if self.admins.filter(id=user.id):
+            return True
+        return False
 
 
 class Membership(models.Model):

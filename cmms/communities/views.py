@@ -11,7 +11,7 @@ from django.db import transaction
 from account.models import User
 from account.utils import ValidUserOrReadOnlyPermission, IsSuperUser
 
-from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunityDetailSerializer, \
+from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunitySimpleSerializer, \
     CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer, \
     CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin, IsOwner, IsUser
@@ -21,7 +21,7 @@ from notice.utils import NoticeManager
 
 class CommunityListView(generics.ListCreateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
-    serializer_class = CommunityDetailSerializer
+    serializer_class = CommunitySimpleSerializer
     queryset = Community.objects.filter(valid=True)
 
     def perform_create(self, serializer):
@@ -41,6 +41,11 @@ class CommunityRetrieveView(generics.RetrieveAPIView):
     serializer_class = CommunitySerializer
     queryset = Community.objects.filter(valid=True)
 
+    def get_serializer_context(self):
+        return {
+            'user': self.request.user
+        }
+
 
 class CommunityTransferView(generics.UpdateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission,
@@ -53,7 +58,7 @@ class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     # modify community name & profile
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
-    serializer_class = CommunityDetailSerializer
+    serializer_class = CommunitySimpleSerializer
     queryset = Community.objects.filter(valid=True)
 
 
