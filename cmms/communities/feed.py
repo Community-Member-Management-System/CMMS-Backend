@@ -1,15 +1,16 @@
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 from django_ical.views import ICalFeed
 from activity.models import Activity
 from django.db.models.query import QuerySet
+from django.contrib.syndication.views import Feed
+
+from communities.models import Community
 
 
-class CommunityEventCalendarFeed(ICalFeed):
-    product_id = '-//cmms/Activity/CN'
-    timezone = 'Asia/Shanghai'
-    file_name = 'feed.ics'
-
+class FeedConfig:
     def get_object(self, request, *args, **kwargs):
-        return int(kwargs['pk'])
+        return get_object_or_404(Community, pk=int(kwargs['pk']))
 
     def items(self, community_id: int) -> 'QuerySet[Activity]':
         return Activity.objects.filter(related_community=community_id).order_by('-start_time')
@@ -35,3 +36,19 @@ class CommunityEventCalendarFeed(ICalFeed):
 
     def item_location(self, item: Activity):
         return item.location
+
+
+class CommunityEventCalendarFeed(FeedConfig, ICalFeed):
+    product_id = '-//CMMS/Activity/CN'
+    timezone = 'Asia/Shanghai'
+    file_name = 'feed.ics'
+
+
+class CommunityEventRSSFeed(FeedConfig, Feed):
+    language = 'zh-cn'
+
+    def title(self, item: Community):
+        return f"社团 {item.name} 的活动 RSS"
+
+    def link(self, item: Community):
+        return f'/community/{item.id}'  # fixme
