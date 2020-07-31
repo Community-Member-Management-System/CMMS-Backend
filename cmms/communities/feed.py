@@ -44,7 +44,8 @@ class CommunityEventCalendarFeed(FeedConfig, ICalFeed):
     file_name = 'feed.ics'
 
 
-class CommunityEventRSSFeed(FeedConfig, Feed):
+class CommunityEventRSSFeed(FeedConfig, Feed):  # type: ignore
+    # mypy is somewhat stupid here...
     language = 'zh-cn'
 
     def title(self, item: Community):
