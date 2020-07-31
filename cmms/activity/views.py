@@ -29,7 +29,7 @@ class ActivityListView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         activity = serializer.save()
-        NoticeManager.create_notice_C_AN(activity.related_community, '新的活动创建')
+        NoticeManager.create_notice_C_AN(activity, subtype=0)
 
 
 class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
