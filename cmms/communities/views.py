@@ -21,8 +21,8 @@ from notice.utils import NoticeManager
 
 class CommunityListView(generics.ListCreateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
-    serializer_class = CommunitySerializer
-    queryset = Community.objects.all()
+    serializer_class = CommunityDetailSerializer
+    queryset = Community.objects.filter(valid=True)
 
     def perform_create(self, serializer):
         with transaction.atomic():

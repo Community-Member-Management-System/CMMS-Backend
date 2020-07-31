@@ -12,7 +12,7 @@ class CommunitySerializer(ModelSerializer):
 
     def get_members(self, community):
         valid_members = community.members.filter(membership__valid=True)
-        serializer = MemberSerializer(instance=valid_members, many=True)
+        serializer = MemberSerializer(instance=valid_members, context={'community': community}, many=True)
         return serializer.data
 
     class Meta:
@@ -34,7 +34,7 @@ class OwnershipTransferSerializer(ModelSerializer):
 class CommunityDetailSerializer(ModelSerializer):
     class Meta:
         model = Community
-        fields = ('name', 'profile', 'avatar')
+        fields = ('id', 'name', 'profile', 'avatar')
 
 
 class CommunityJoinSerializer(Serializer):
@@ -42,9 +42,21 @@ class CommunityJoinSerializer(Serializer):
 
 
 class MemberSerializer(ModelSerializer):
+    role = SerializerMethodField()
+
+    def get_role(self, user):
+        community = self.context['community']
+        owner = community.owner
+        if user == owner:
+            return 'owner'
+        if community.admins.filter(id=user.pk):
+            return 'admin'
+
+        return None
+
     class Meta:
         model = User
-        fields = ('id', 'real_name', 'nick_name', 'avatar')
+        fields = ('id', 'real_name', 'nick_name', 'avatar', 'role')
 
 
 class CommunityNewMemberAuditSerializer(ModelSerializer):
@@ -53,7 +65,7 @@ class CommunityNewMemberAuditSerializer(ModelSerializer):
     def get_invalid_members(self, community):
         # fixme: dup code
         invalid_list = community.members.filter(membership__valid=False)
-        serializer = MemberSerializer(instance=invalid_list, many=True)
+        serializer = MemberSerializer(instance=invalid_list, context={'community': community}, many=True)
         return serializer.data
 
     class Meta:
@@ -79,7 +91,7 @@ class CommunityInviteSerializer(ModelSerializer):
 
     def get_non_members(self, community):
         non_members_list = get_community_non_members_list(community)
-        serializer = MemberSerializer(instance=non_members_list, many=True)
+        serializer = MemberSerializer(instance=non_members_list, context={'community': community}, many=True)
         return serializer.data
 
     class Meta:
