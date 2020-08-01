@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAcceptable, APIException
+from rest_framework.request import Request
 
 from django.db import transaction
 
@@ -35,6 +36,11 @@ class CommunityListView(generics.ListCreateAPIView):
                 description=f'用户 {self.request.user} 申请创建社团 {community.name}'
             )
 
+    def get_serializer_context(self):
+        return {
+            'user': self.request.user
+        }
+
 
 class CommunityRetrieveView(generics.RetrieveAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
@@ -64,8 +70,18 @@ class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 class CommunityDestroyView(generics.DestroyAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission,
-                          IsOwnerOrReadOnly]
+                          IsOwner]
     queryset = Community.objects.all()
+
+    def perform_destroy(self, instance: Community) -> None:  # type: ignore
+        request: Request = self.request  # type: ignore
+        description = request.data.get('description')
+        with transaction.atomic():
+            NoticeManager.create_notice_C_D(
+                related_community=instance,
+                description=description
+            )
+            instance.delete()
 
 
 class CommunityJoinView(APIView):
@@ -127,20 +143,21 @@ class CommunityNewMemberAuditActionView(APIView):
         related_user = community.members.get(id=user_id)
         subtype_ca = 1
         subtype_c_ap = 2
-        if action == 'allow':
-            description = '加入社团请求被通过。'
-            NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
-            NoticeManager.create_notice_C_AP(related_user, community, subtype_c_ap)
+        with transaction.atomic():
+            if action == 'allow':
+                description = '加入社团请求被通过。'
+                NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
+                NoticeManager.create_notice_C_AP(related_user, community, subtype_c_ap)
 
-            member.valid = True
-            member.save()
-        elif action == 'deny':
-            description = '加入社团请求被拒绝。'
-            NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
+                member.valid = True
+                member.save()
+            elif action == 'deny':
+                description = '加入社团请求被拒绝。'
+                NoticeManager.create_notice_CA(related_user, community, subtype_ca, description)
 
-            member.delete()
-        else:
-            raise NotAcceptable('错误的操作。')
+                member.delete()
+            else:
+                raise NotAcceptable('错误的操作。')
 
         return Response(CommunityNewMemberAuditSerializer(community).data)
 
@@ -193,7 +210,7 @@ class CommunityAdminSendInvitationView(APIView):
                     related_community=community,
                     subtype=0
                 )
-                return Response('success')  # fixme
+                return Response(status=status.HTTP_200_OK)  # fixme
             else:
                 raise NotAcceptable('此用户不在可邀请列表中。')
 
@@ -214,7 +231,7 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
         with transaction.atomic():
             community.members.add(invitation.user, through_defaults={'valid': True})
             invitation.delete()
-        return Response('success')  # fixme
+        return Response(status=status.HTTP_200_OK)  # fixme
 
     @action(methods=['post'], detail=True)
     def deny(self, request, *args, **kwargs):
@@ -226,4 +243,4 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
                 subtype=0
             )
             invitation.delete()
-        return Response('success')  # fixme
+        return Response(status=status.HTTP_200_OK)  # fixme
