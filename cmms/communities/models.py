@@ -64,7 +64,7 @@ class Community(models.Model):
         :param user: 一般为 request.user
         :return: {'member': 是否在 membership 中, 'valid': 是否有效}
         """
-        if user is None:
+        if user is None or user.is_authenticated is False:
             member = False
             valid = False
         else:
@@ -80,13 +80,15 @@ class Community(models.Model):
         }
 
     def is_admin(self, user: Optional[User]) -> bool:
-        if user is None:
+        if user is None or user.is_authenticated is False:
             return False
         if self.admins.filter(id=user.id):
             return True
         return False
 
     def display_member_status(self, user: Optional[User]) -> str:
+        if user is None or user.is_authenticated is False:
+            return ''
         status = self.get_member_status(user)
         if status['member'] is False:
             return '未加入'
