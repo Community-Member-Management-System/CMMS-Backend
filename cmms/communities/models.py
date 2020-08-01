@@ -58,18 +58,22 @@ class Community(models.Model):
     avatar = models.ImageField(upload_to=community_avatar_path, verbose_name=_("头像"), blank=True)
     valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
-    def get_member_status(self, user: User) -> MemberStatusDictType:
+    def get_member_status(self, user: Optional[User]) -> MemberStatusDictType:
         """
         判断某个用户在社团中的情况。
         :param user: 一般为 request.user
         :return: {'member': 是否在 membership 中, 'valid': 是否有效}
         """
-        if self.membership_set.filter(user=user).exists():
-            member = True
-            valid = self.membership_set.get(user=user).valid
-        else:
+        if user is None:
             member = False
             valid = False
+        else:
+            if self.membership_set.filter(user=user).exists():
+                member = True
+                valid = self.membership_set.get(user=user).valid
+            else:
+                member = False
+                valid = False
         return {
             'member': member,
             'valid': valid
@@ -81,6 +85,15 @@ class Community(models.Model):
         if self.admins.filter(id=user.id):
             return True
         return False
+
+    def display_member_status(self, user: Optional[User]) -> str:
+        status = self.get_member_status(user)
+        if status['member'] is False:
+            return '未加入'
+        elif status['valid'] is False:
+            return '审核中'
+        else:
+            return '已加入'
 
 
 class Membership(models.Model):

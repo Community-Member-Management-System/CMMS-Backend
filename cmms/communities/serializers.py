@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework.serializers import ModelSerializer, BooleanField, Serializer, SerializerMethodField
 from rest_framework.exceptions import ValidationError
 
@@ -8,9 +10,13 @@ from .models import Community, Invitation
 
 
 class CommunitySerializer(ModelSerializer):
+    """
+    When using this serializer, 'community' and 'user' are required in context.
+    """
     members = SerializerMethodField()
+    join_status = SerializerMethodField()
 
-    def get_members(self, community):
+    def get_members(self, community: Community):
         valid_members = community.members.filter(membership__valid=True)
         serializer = MemberSerializer(instance=valid_members,
                                       context={
@@ -19,10 +25,14 @@ class CommunitySerializer(ModelSerializer):
                                       }, many=True)
         return serializer.data
 
+    def get_join_status(self, community: Community):
+        user: Optional[User] = self.context.get('user')
+        return community.display_member_status(user)
+
     class Meta:
         model = Community
         fields = '__all__'
-        read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins', 'valid']
+        read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins', 'valid', 'join_status']
 
 
 class OwnershipTransferSerializer(ModelSerializer):
@@ -36,9 +46,15 @@ class OwnershipTransferSerializer(ModelSerializer):
 
 
 class CommunitySimpleSerializer(ModelSerializer):
+    join_status = SerializerMethodField()
+
+    def get_join_status(self, community: Community):
+        user: Optional[User] = self.context.get('user')
+        return community.display_member_status(user)
+
     class Meta:
         model = Community
-        fields = ('id', 'name', 'profile', 'avatar')
+        fields = ('id', 'name', 'profile', 'avatar', 'join_status')
 
 
 class CommunityJoinSerializer(Serializer):
@@ -49,7 +65,7 @@ class MemberSerializer(ModelSerializer):
     role = SerializerMethodField()
     real_name = SerializerMethodField()
 
-    def get_role(self, user):
+    def get_role(self, user: User):
         community = self.context['community']
         owner = community.owner
         if user == owner:
@@ -59,7 +75,7 @@ class MemberSerializer(ModelSerializer):
 
         return None
 
-    def get_real_name(self, user):
+    def get_real_name(self, user: User):
         # for user's privacy
         if self.context.get('admin') is True:
             return user.real_name
@@ -74,7 +90,7 @@ class MemberSerializer(ModelSerializer):
 class CommunityNewMemberAuditSerializer(ModelSerializer):
     invalid_members = SerializerMethodField()
 
-    def get_invalid_members(self, community):
+    def get_invalid_members(self, community: Community):
         # fixme: dup code
         invalid_list = community.members.filter(membership__valid=False)
         serializer = MemberSerializer(instance=invalid_list, context={'community': community, 'admin': True}, many=True)
@@ -101,7 +117,7 @@ def get_community_non_members_list(community) -> 'QuerySet[User]':
 class CommunityInviteSerializer(ModelSerializer):
     non_members = SerializerMethodField()
 
-    def get_non_members(self, community):
+    def get_non_members(self, community: Community):
         non_members_list = get_community_non_members_list(community)
         serializer = MemberSerializer(instance=non_members_list, context={'community': community}, many=True)
         return serializer.data

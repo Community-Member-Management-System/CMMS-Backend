@@ -92,7 +92,10 @@ class CommunityJoinView(APIView):
                         community.members.add(request.user)
                     else:
                         if user_status['member']:
-                            community.members.remove(request.user)
+                            if request.user != community.owner:
+                                community.members.remove(request.user)
+                            else:
+                                raise NotAcceptable('社团所有者无法直接退出社团。')
                         else:
                             raise NotAcceptable('你不是此社团成员！')
                     return Response(community.get_member_status(request.user))

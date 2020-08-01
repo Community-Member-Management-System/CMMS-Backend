@@ -22,7 +22,7 @@ class CurrentUserInfoSerializer(serializers.ModelSerializer):
     """
     communities = SerializerMethodField()
 
-    def get_communities(self, user):
+    def get_communities(self, user: User):
         user_communities_list = Community.objects.filter(membership__user=user)
         serializer = CommunitySimpleSerializer(user_communities_list, many=True)
         return serializer.data
