@@ -37,8 +37,9 @@ class CommunitySerializer(ModelSerializer):
 
 class OwnershipTransferSerializer(ModelSerializer):
     def validate_owner(self, value):
-        if value not in self.instance.membership_set.all():
-            raise ValidationError('Specified user is not a member of the community')
+        if value not in self.instance.admins.all():
+            raise ValidationError('选择的用户不是该社团的管理员')
+        return value
 
     class Meta:
         model = Community
