@@ -17,13 +17,15 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins, viewsets, generics, permissions
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer
+from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, MsgSerializer, \
+    LoginSerializer, LoginResponseSerializer
 from .utils import is_new_user
 
 
@@ -37,6 +39,10 @@ class BaseLoginView(APIView):
     template_context = None
     permission_classes: Sequence[Type[BasePermission]] = []
 
+    @swagger_auto_schema(request_body=LoginSerializer, responses={
+        200: LoginResponseSerializer,
+        401: MsgSerializer
+    })
     def post(self, request):
         username = self.request.data.get('username')
         password = self.request.data.get('password')
@@ -75,6 +81,10 @@ class CASLoginView(BaseLoginView):
     student_id: str
     permission_classes: Sequence[Type[BasePermission]] = []
 
+    @swagger_auto_schema(responses={
+        302: 'Redirect to USTC CAS Server, or redirect to /',
+        401: 'CAS Login failure'
+    })
     def get(self, request):
         self.service = request.build_absolute_uri()
         self.ticket = request.GET.get('ticket')
@@ -90,6 +100,7 @@ class CASLoginView(BaseLoginView):
         return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
                             status=status.HTTP_401_UNAUTHORIZED)
 
+    @swagger_auto_schema(auto_schema=None)
     def post(self, request):
         return HttpResponseNotAllowed(["GET"])
 
@@ -114,8 +125,14 @@ class CASLoginView(BaseLoginView):
 
 
 class LogoutView(APIView):
+    """
+    Logout (POST)
+    """
     permission_classes: Sequence[Type[BasePermission]] = []
 
+    @swagger_auto_schema(responses={
+        200: MsgSerializer
+    })
     def post(self, request):
         logout(request)
         return Response({
@@ -125,8 +142,14 @@ class LogoutView(APIView):
 
 
 class LoginCheckView(APIView):
+    """
+    A view for checking current user status
+    """
     permission_classes: Sequence[Type[BasePermission]] = []
 
+    @swagger_auto_schema(responses={
+        200: UserCheckSerializer
+    })
     def post(self, request):
         return Response({
             "login": request.user.is_authenticated,
@@ -144,6 +167,9 @@ class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
+    """
+    A view for current user to get and modify his information
+    """
     serializer_class = CurrentUserInfoSerializer
 
     def get_object(self):

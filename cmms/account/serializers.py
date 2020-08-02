@@ -33,3 +33,24 @@ class CurrentUserInfoSerializer(serializers.ModelSerializer):
                    'is_superuser', 'groups', 'user_permissions')
         read_only_fields = ('student_id',)
         required = ('real_name', 'nick_name')
+
+
+class NewUserSerializer(serializers.Serializer):
+    new = serializers.BooleanField(label='是否为新用户')
+
+
+class UserCheckSerializer(NewUserSerializer, serializers.Serializer):
+    login = serializers.BooleanField(label='是否已经登录')
+
+
+class MsgSerializer(serializers.Serializer):
+    msg = serializers.CharField(label='提示信息', allow_blank=True)
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(label='用户名')
+    password = serializers.CharField(label='密码')
+
+
+class LoginResponseSerializer(NewUserSerializer, MsgSerializer):
+    pass
