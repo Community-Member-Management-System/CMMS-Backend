@@ -13,7 +13,8 @@
 | 字段 | 备注 |
 | -- | -- |
 | pk | NoticeBox 主键 |
-| read | 标记为已读 |
+| read | 是否标记为已读 |
+| administrative | 是否为管理员通知 |
 
 ### 请求通知内容/标记为已读/标记为未读/删除
 
@@ -104,3 +105,4 @@
 + notice
 + read
 + deleted
++ administrative
