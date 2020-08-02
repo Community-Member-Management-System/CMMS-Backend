@@ -59,12 +59,12 @@ class NoticeManager:
     @classmethod
     def __create_notice_C_A(cls, community, notice):
         for admin in community.admins.all():
-            cls.__notice_box_manager.create(user=admin, notice=notice)
+            cls.__notice_box_manager.create(user=admin, notice=notice, administrative=True)
 
     @classmethod
     def __create_notice_S(cls, notice):
         for superuser in cls.__user_manager.filter(is_superuser=True):
-            cls.__notice_box_manager.create(user=superuser, notice=notice)
+            cls.__notice_box_manager.create(user=superuser, notice=notice, administrative=True)
 
     # 创建 Notice 的方法
     @classmethod

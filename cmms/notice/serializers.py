@@ -14,4 +14,4 @@ class NoticeSerializer(serializers.ModelSerializer):
 class NoticeBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoticeBox
-        fields = ['pk', 'read']
+        fields = ['pk', 'read', 'administrative']

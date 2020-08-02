@@ -64,6 +64,7 @@ class NoticeBox(models.Model):
                                verbose_name=_('通知'))
     read = models.BooleanField(default=False, verbose_name=_('已读'))
     deleted = models.BooleanField(default=False, verbose_name=_('已删除'))
+    administrative = models.BooleanField(default=False, verbose_name=_('是否为管理员通知'))
 
     def __str__(self):
         return str(self.id)
