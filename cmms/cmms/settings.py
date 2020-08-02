@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'communities',
     'notice.apps.NoticeConfig',
     'activity.apps.ActivityConfig',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [

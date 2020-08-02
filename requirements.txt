@@ -7,3 +7,4 @@ djangorestframework-stubs==1.2.0
 typing-extensions==3.7.4.2
 Pillow==7.2.0
 django-ical==1.7.1
+drf-yasg==1.17.1
