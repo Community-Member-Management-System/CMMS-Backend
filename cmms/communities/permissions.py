@@ -23,7 +23,7 @@ class IsAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         found = obj.admins.filter(id=request.user.pk)
 
-        return found and obj.valid is True
+        return (found or obj.owner == request.user.pk) and obj.valid is True
 
 
 class IsValidClubMember(permissions.BasePermission):

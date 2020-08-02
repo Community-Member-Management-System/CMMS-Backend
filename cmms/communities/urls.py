@@ -20,6 +20,9 @@ urlpatterns = [
          views.CommunityNewMemberAuditActionView.as_view(), name='new_member_action'),
     path('<int:pk>/invite', views.CommunityAdminInviteView.as_view(), name='invite'),
     path('<int:pk>/invite/<int:user_id>', views.CommunityAdminSendInvitationView.as_view(), name='send_invitation'),
+    path('<int:pk>/members/<int:user_id>/delete', views.CommunityUserRemoveView.as_view(), name='member_delete'),
+    path('<int:pk>/members/<int:user_id>/admin/<str:action>',
+         views.CommunityAdminSetView.as_view(), name='admin_action'),
     path('<int:pk>/feed.ics', feed.CommunityEventCalendarFeed(), name='ics_feed'),
     path('<int:pk>/atom.xml', feed.CommunityEventRSSFeed(), name='rss_feed'),
 ]

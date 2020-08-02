@@ -244,3 +244,47 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
             )
             invitation.delete()
         return Response(status=status.HTTP_200_OK)  # fixme
+
+
+class CommunityUserRemoveView(APIView):
+    permission_classes = [IsAdmin]
+
+    def delete(self, request, pk, user_id):
+        community = get_object_or_404(Community, pk=pk, valid=True)
+        self.check_object_permissions(request, community)
+        with transaction.atomic():
+            if community.members.filter(id=user_id):
+                user = User.objects.get(id=user_id)
+                if community.owner != user and community.is_admin(user) is False:
+                    community.members.remove(user)
+                    NoticeManager.create_notice_PC(
+                        related_user=user,
+                        related_community=community,
+                        subtype=2
+                    )
+                    return Response(status=status.HTTP_200_OK)  # fixme
+                else:
+                    return NotAcceptable('无法踢出所有者和管理员。')
+            else:
+                raise NotAcceptable('此用户不在此社团中。')
+
+
+class CommunityAdminSetView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request, pk, user_id, action):
+        community = get_object_or_404(Community, pk=pk, valid=True)
+        self.check_object_permissions(request, community)
+        with transaction.atomic():
+            if community.members.filter(id=user_id):
+                user = User.objects.get(id=user_id)
+                admin_status = community.is_admin(user)
+                if action == 'set' and admin_status is False:
+                    community.admins.add(user)
+                elif action == 'unset' and admin_status is True:
+                    community.admins.remove(user)
+                else:
+                    raise NotAcceptable('错误的操作。')
+            else:
+                raise NotAcceptable('此用户不在此社团中。')
+            return Response(status=status.HTTP_200_OK)
