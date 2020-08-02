@@ -47,15 +47,9 @@ class OwnershipTransferSerializer(ModelSerializer):
 
 
 class CommunitySimpleSerializer(ModelSerializer):
-    join_status = SerializerMethodField()
-
-    def get_join_status(self, community: Community):
-        user: Optional[User] = self.context.get('user')
-        return community.display_member_status(user)
-
     class Meta:
         model = Community
-        fields = ('id', 'name', 'profile', 'avatar', 'join_status')
+        fields = ('id', 'name', 'profile', 'avatar')
 
 
 class CommunityJoinSerializer(Serializer):

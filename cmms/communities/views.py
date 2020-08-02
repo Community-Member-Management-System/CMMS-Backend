@@ -21,6 +21,9 @@ from notice.utils import NoticeManager
 
 
 class CommunityListView(generics.ListCreateAPIView):
+    """
+    List all valid communities, and create
+    """
     permission_classes = [ValidUserOrReadOnlyPermission]
     serializer_class = CommunitySimpleSerializer
     queryset = Community.objects.filter(valid=True)
@@ -43,6 +46,9 @@ class CommunityListView(generics.ListCreateAPIView):
 
 
 class CommunityRetrieveView(generics.RetrieveAPIView):
+    """
+    Get a specific valid community info
+    """
     permission_classes = [ValidUserOrReadOnlyPermission]
     serializer_class = CommunitySerializer
     queryset = Community.objects.filter(valid=True)
@@ -54,13 +60,19 @@ class CommunityRetrieveView(generics.RetrieveAPIView):
 
 
 class CommunityTransferView(generics.UpdateAPIView):
+    """
+    Transfer valid community owner to others (for owner only)
+    """
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
     serializer_class = OwnershipTransferSerializer
     queryset = Community.objects.filter(valid=True)
 
 
-class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+class CommunityInfoRetrieveUpdateView(generics.UpdateAPIView):
+    """
+    A view for updating current valid community name & profile (for owner only)
+    """
     # modify community name & profile
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
@@ -69,6 +81,9 @@ class CommunityInfoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class CommunityDestroyView(generics.DestroyAPIView):
+    """
+    A view for destroying current community (frontend shall do double-check for users)
+    """
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwner]
     queryset = Community.objects.all()
@@ -85,6 +100,9 @@ class CommunityDestroyView(generics.DestroyAPIView):
 
 
 class CommunityJoinView(APIView):
+    """
+    A view for joining or leaving valid community
+    """
     permission_classes = [ValidUserOrReadOnlyPermission]
 
     def get(self, request, pk):
@@ -122,12 +140,18 @@ class CommunityJoinView(APIView):
 
 
 class CommunityNewMemberAuditView(generics.RetrieveAPIView):
+    """
+    A view for valid community admins to show new members
+    """
     permission_classes = [IsAdmin]
     queryset = Community.objects.filter(valid=True)
     serializer_class = CommunityNewMemberAuditSerializer
 
 
 class CommunityNewMemberAuditActionView(APIView):
+    """
+    A view for valid community admins to audit new members
+    """
     permission_classes = [IsAdmin]
 
     def post(self, request, pk, user_id, action):
@@ -166,6 +190,9 @@ class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
                                     mixins.UpdateModelMixin,
                                     mixins.RetrieveModelMixin,
                                     viewsets.GenericViewSet):
+    """
+    A view for sysadmin to audit new communities
+    """
     permission_classes = [IsSuperUser]
     serializer_class = CommunitySysAdminAuditSerializer
     queryset = Community.objects.all()
@@ -186,12 +213,18 @@ class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
 
 
 class CommunityAdminInviteView(generics.RetrieveAPIView):
+    """
+    A view for valid community admin to show who can invite
+    """
     permission_classes = [IsAdmin]
     serializer_class = CommunityInviteSerializer
     queryset = Community.objects.filter(valid=True)
 
 
 class CommunityAdminSendInvitationView(APIView):
+    """
+    A view for valid community admin to send invitation to others
+    """
     permission_classes = [IsAdmin]
 
     def post(self, request, pk, user_id):
@@ -218,6 +251,9 @@ class CommunityAdminSendInvitationView(APIView):
 class CommunityUserInvitationViewSet(mixins.ListModelMixin,
                                      mixins.RetrieveModelMixin,
                                      viewsets.GenericViewSet):
+    """
+    A viewset for users to handle invitations
+    """
     permission_classes = [IsUser]
     serializer_class = CommunityInvitationSerializer
 
@@ -247,6 +283,9 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
 
 
 class CommunityUserRemoveView(APIView):
+    """
+    A view for valid community admin to remove members (except for owner and admins)
+    """
     permission_classes = [IsAdmin]
 
     def delete(self, request, pk, user_id):
@@ -270,7 +309,10 @@ class CommunityUserRemoveView(APIView):
 
 
 class CommunityAdminSetView(APIView):
-    permission_classes = [IsAdmin]
+    """
+    A view for community owner to set or unset admins
+    """
+    permission_classes = [IsOwner]
 
     def post(self, request, pk, user_id, action):
         community = get_object_or_404(Community, pk=pk, valid=True)
