@@ -25,7 +25,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, MsgSerializer, \
+from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, DetailSerializer, \
     LoginSerializer, LoginResponseSerializer
 from .utils import is_new_user
 
@@ -42,7 +42,7 @@ class BaseLoginView(APIView):
 
     @swagger_auto_schema(request_body=LoginSerializer, responses={
         200: LoginResponseSerializer,
-        401: MsgSerializer
+        401: DetailSerializer
     })
     def post(self, request):
         username = self.request.data.get('username')
@@ -50,11 +50,11 @@ class BaseLoginView(APIView):
         if authenticate(self.request, username=username, password=password):
             user = self.login(username=username)
             return Response({
-                "msg": "登录成功。",
+                "detail": "登录成功。",
                 "new": is_new_user(user),
             })
         return Response({
-            "msg": "登录失败。"
+            "detail": "登录失败。"
         }, status=status.HTTP_401_UNAUTHORIZED)
 
     def login(self, **kwargs) -> User:
@@ -97,7 +97,7 @@ class CASLoginView(BaseLoginView):
             return redirect(f'{settings.CAS_SERVICE_URL}/login?{urlencode({"service": service})}')
         if self.check_ticket():
             user = self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
-            return redirect(f"/?login=true&new={'true' if is_new_user(user) else 'false'}")
+            return redirect(f"/?login=true&new={'true' if is_new_user(user) else 'false'}&userid={user.id}")
         return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
                             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -132,13 +132,13 @@ class LogoutView(APIView):
     permission_classes: Sequence[Type[BasePermission]] = []
 
     @swagger_auto_schema(responses={
-        200: MsgSerializer
+        200: DetailSerializer
     })
     def post(self, request):
         logout(request)
         return Response({
-            "msg": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
-                   f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
+            "detail": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
+                      f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
         })
 
 
@@ -154,7 +154,8 @@ class LoginCheckView(APIView):
     def post(self, request):
         return Response({
             "login": request.user.is_authenticated,
-            "new": None if not request.user.is_authenticated else is_new_user(request.user)
+            "new": None if not request.user.is_authenticated else is_new_user(request.user),
+            "userid": None if not request.user.is_authenticated else request.user.id
         })
 
 

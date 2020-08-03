@@ -41,10 +41,11 @@ class NewUserSerializer(serializers.Serializer):
 
 class UserCheckSerializer(NewUserSerializer, serializers.Serializer):
     login = serializers.BooleanField(label='是否已经登录')
+    userid = serializers.IntegerField(label='用户 ID')
 
 
-class MsgSerializer(serializers.Serializer):
-    msg = serializers.CharField(label='提示信息', allow_blank=True)
+class DetailSerializer(serializers.Serializer):
+    detail = serializers.CharField(label='提示信息', allow_blank=True)
 
 
 class LoginSerializer(serializers.Serializer):
@@ -52,5 +53,5 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(label='密码')
 
 
-class LoginResponseSerializer(NewUserSerializer, MsgSerializer):
+class LoginResponseSerializer(NewUserSerializer, DetailSerializer):
     pass
