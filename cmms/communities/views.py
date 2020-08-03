@@ -1,6 +1,7 @@
 from rest_framework import generics, status, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,6 +28,7 @@ class CommunityListView(generics.ListCreateAPIView):
     permission_classes = [ValidUserOrReadOnlyPermission]
     serializer_class = CommunitySimpleSerializer
     queryset = Community.objects.filter(valid=True)
+    parser_classes = [MultiPartParser]
 
     def perform_create(self, serializer):
         with transaction.atomic():
@@ -45,48 +47,25 @@ class CommunityListView(generics.ListCreateAPIView):
         }
 
 
-class CommunityRetrieveView(generics.RetrieveAPIView):
+class CommunityRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Get a specific valid community info
+    Get, update or delete a specific valid community info (modify is for owner only)
     """
-    permission_classes = [ValidUserOrReadOnlyPermission]
+    permission_classes = [ValidUserOrReadOnlyPermission,
+                          IsOwnerOrReadOnly]
     serializer_class = CommunitySerializer
-    queryset = Community.objects.filter(valid=True)
+    parser_classes = [MultiPartParser]
 
     def get_serializer_context(self):
         return {
             'user': self.request.user
         }
 
-
-class CommunityTransferView(generics.UpdateAPIView):
-    """
-    Transfer valid community owner to others (for owner only)
-    """
-    permission_classes = [ValidUserOrReadOnlyPermission,
-                          IsOwnerOrReadOnly]
-    serializer_class = OwnershipTransferSerializer
-    queryset = Community.objects.filter(valid=True)
-
-
-class CommunityInfoRetrieveUpdateView(generics.UpdateAPIView):
-    """
-    A view for updating current valid community name & profile (for owner only)
-    """
-    # modify community name & profile
-    permission_classes = [ValidUserOrReadOnlyPermission,
-                          IsOwnerOrReadOnly]
-    serializer_class = CommunitySimpleSerializer
-    queryset = Community.objects.filter(valid=True)
-
-
-class CommunityDestroyView(generics.DestroyAPIView):
-    """
-    A view for destroying current community (frontend shall do double-check for users)
-    """
-    permission_classes = [ValidUserOrReadOnlyPermission,
-                          IsOwner]
-    queryset = Community.objects.all()
+    def get_queryset(self):
+        if self.request.method == 'DELETE':
+            return Community.objects.all()
+        else:
+            return Community.objects.filter(valid=True)
 
     def perform_destroy(self, instance: Community) -> None:  # type: ignore
         request: Request = self.request  # type: ignore
@@ -97,6 +76,16 @@ class CommunityDestroyView(generics.DestroyAPIView):
                 description=description
             )
             instance.delete()
+
+
+class CommunityTransferView(generics.UpdateAPIView):
+    """
+    Transfer valid community owner to others (for owner only)
+    """
+    permission_classes = [ValidUserOrReadOnlyPermission,
+                          IsOwnerOrReadOnly]
+    serializer_class = OwnershipTransferSerializer
+    queryset = Community.objects.filter(valid=True)
 
 
 class CommunityJoinView(APIView):
