@@ -19,6 +19,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins, viewsets, generics, permissions
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -171,6 +172,7 @@ class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
     A view for current user to get and modify his information
     """
     serializer_class = CurrentUserInfoSerializer
+    parser_classes = [MultiPartParser]
 
     def get_object(self):
         return self.request.user
