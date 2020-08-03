@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -15,7 +16,8 @@ from account.utils import ValidUserOrReadOnlyPermission, IsSuperUser
 
 from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunitySimpleSerializer, \
     CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer, \
-    CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer
+    CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer, \
+    CommunityJoinResponseSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin, IsOwner, IsUser
 from .models import Community, Invitation
 from notice.utils import NoticeManager
@@ -94,10 +96,18 @@ class CommunityJoinView(APIView):
     """
     permission_classes = [ValidUserOrReadOnlyPermission]
 
+    @swagger_auto_schema(responses={
+        200: CommunityJoinResponseSerializer
+    })
     def get(self, request, pk):
         community = get_object_or_404(Community, pk=pk, valid=True)
         return Response(community.get_member_status(request.user))
 
+    @swagger_auto_schema(request_body=CommunityJoinSerializer, responses={
+        200: CommunityJoinResponseSerializer,
+        400: "Parameter 'join' is invalid",
+        406: "Unacceptable 'join' action"
+    })
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk, valid=True)
         serializer = CommunityJoinSerializer(data=request.data)
@@ -139,10 +149,14 @@ class CommunityNewMemberAuditView(generics.RetrieveAPIView):
 
 class CommunityNewMemberAuditActionView(APIView):
     """
-    A view for valid community admins to audit new members
+    A view for valid community admins to audit new members. Action: "allow" or "deny"
     """
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(responses={
+        200: "Done",
+        406: "Wrong action parameter."
+    })
     def post(self, request, pk, user_id, action):
         community = get_object_or_404(Community, pk=pk, valid=True)
         self.check_object_permissions(request, community)
@@ -172,7 +186,7 @@ class CommunityNewMemberAuditActionView(APIView):
             else:
                 raise NotAcceptable('错误的操作。')
 
-        return Response(CommunityNewMemberAuditSerializer(community).data)
+        return Response(status=status.HTTP_200_OK)
 
 
 class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
@@ -216,6 +230,10 @@ class CommunityAdminSendInvitationView(APIView):
     """
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(responses={
+        200: "Done",
+        406: "Not in the invitation list"
+    })
     def post(self, request, pk, user_id):
         community = get_object_or_404(Community, pk=pk, valid=True)
         self.check_object_permissions(request, community)
@@ -232,7 +250,7 @@ class CommunityAdminSendInvitationView(APIView):
                     related_community=community,
                     subtype=0
                 )
-                return Response(status=status.HTTP_200_OK)  # fixme
+                return Response(status=status.HTTP_200_OK)
             else:
                 raise NotAcceptable('此用户不在可邀请列表中。')
 
@@ -249,6 +267,9 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         return Invitation.objects.filter(user=self.request.user)
 
+    @swagger_auto_schema(responses={
+        204: "Done"
+    })
     @action(methods=['post'], detail=True)
     def accept(self, request, *args, **kwargs):
         invitation = self.get_object()
@@ -256,8 +277,11 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
         with transaction.atomic():
             community.members.add(invitation.user, through_defaults={'valid': True})
             invitation.delete()
-        return Response(status=status.HTTP_200_OK)  # fixme
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @swagger_auto_schema(responses={
+        204: "Done"
+    })
     @action(methods=['post'], detail=True)
     def deny(self, request, *args, **kwargs):
         invitation = self.get_object()
@@ -268,7 +292,7 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
                 subtype=0
             )
             invitation.delete()
-        return Response(status=status.HTTP_200_OK)  # fixme
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CommunityUserRemoveView(APIView):
@@ -277,6 +301,10 @@ class CommunityUserRemoveView(APIView):
     """
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(responses={
+        204: "Done",
+        406: "User is owner or admin, or user is not in community"
+    })
     def delete(self, request, pk, user_id):
         community = get_object_or_404(Community, pk=pk, valid=True)
         self.check_object_permissions(request, community)
@@ -290,19 +318,23 @@ class CommunityUserRemoveView(APIView):
                         related_community=community,
                         subtype=2
                     )
-                    return Response(status=status.HTTP_200_OK)  # fixme
+                    return Response(status=status.HTTP_204_NO_CONTENT)
                 else:
-                    return NotAcceptable('无法踢出所有者和管理员。')
+                    raise NotAcceptable('无法踢出所有者和管理员。')
             else:
                 raise NotAcceptable('此用户不在此社团中。')
 
 
 class CommunityAdminSetView(APIView):
     """
-    A view for community owner to set or unset admins
+    A view for community owner to set or unset admins. Action: "set" or "unset"
     """
     permission_classes = [IsOwner]
 
+    @swagger_auto_schema(responses={
+        200: "Done",
+        406: "Wrong action parameter, or user is not in community"
+    })
     def post(self, request, pk, user_id, action):
         community = get_object_or_404(Community, pk=pk, valid=True)
         self.check_object_permissions(request, community)

@@ -127,3 +127,8 @@ class CommunityInvitationSerializer(ModelSerializer):
         model = Invitation
         fields = '__all__'
         read_only_fields = ('user', 'community')
+
+
+class CommunityJoinResponseSerializer(Serializer):
+    member = BooleanField(label='是否为社团成员')
+    valid = BooleanField(label='是否为已通过审核状态')
