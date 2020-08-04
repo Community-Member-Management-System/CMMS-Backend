@@ -100,6 +100,7 @@ class CASLoginView(BaseLoginView):
             response = redirect(request.GET.get('next', '/'))
             response.set_cookie('refresh', jwt['refresh'])
             response.set_cookie('access', jwt['access'])
+            response.set_cookie('login', 'true')
             return response
         return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
                             status=status.HTTP_401_UNAUTHORIZED)
