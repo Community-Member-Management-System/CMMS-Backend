@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'communities',
     'notice.apps.NoticeConfig',
     'activity.apps.ActivityConfig',
-    'drf_yasg'
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -139,6 +139,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
         'account.utils.ValidUserPermission',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
 }
 
 ENABLE_EMAIL = False
