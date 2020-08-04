@@ -17,6 +17,7 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins, viewsets, generics, permissions
 from rest_framework.parsers import MultiPartParser
@@ -167,12 +168,15 @@ class LoginCheckView(APIView):
         })
 
 
+@method_decorator(name='update', decorator=swagger_auto_schema(
+    request_body=CurrentUserInfoSerializer
+))
 class UserViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
     """
-    List, Retrieve and update user info. See PublicUserInfoSerializer and CurrentUserInfoSerializer for response format.
+    List, Retrieve and update user info. See PublicUserInfo and CurrentUserInfo (below) for response format.
     """
     queryset = User.objects.all()
     permission_classes = [UserInfoPermission]
