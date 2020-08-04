@@ -171,6 +171,9 @@ class LoginCheckView(APIView):
 @method_decorator(name='update', decorator=swagger_auto_schema(
     request_body=CurrentUserInfoSerializer
 ))
+@method_decorator(name='partial_update', decorator=swagger_auto_schema(
+    request_body=CurrentUserInfoSerializer
+))
 class UserViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
