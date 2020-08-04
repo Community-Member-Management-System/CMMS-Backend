@@ -190,8 +190,12 @@ class UserViewSet(mixins.ListModelMixin,
             return CurrentUserInfoSerializer
         if self.action == 'list':
             return PublicUserInfoSerializer
-        user: User = self.get_object()
-        if user == self.request.user:
-            return CurrentUserInfoSerializer
-        else:
+        try:
+            user: User = self.get_object()
+            if user == self.request.user:
+                return CurrentUserInfoSerializer
+            else:
+                return PublicUserInfoSerializer
+        except AssertionError:
+            # fix complaining drf-yasg
             return PublicUserInfoSerializer
