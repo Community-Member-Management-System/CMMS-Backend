@@ -82,7 +82,7 @@ class CASLoginView(BaseLoginView):
     permission_classes: Sequence[Type[BasePermission]] = []
 
     @swagger_auto_schema(responses={
-        302: 'Redirect to USTC CAS Server, or redirect to /',
+        302: 'Redirect to USTC CAS Server, or redirect to / (and set cookie "refresh", "access" and "login=true")',
         401: 'CAS Login failure'
     })
     def get(self, request):

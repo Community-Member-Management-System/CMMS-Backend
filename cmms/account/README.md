@@ -4,108 +4,31 @@
 
 有两个 Model: 继承自 AbstractBaseUser 的自定义用户类型（**其他所有需要使用 User 的地方都必须使用这个 Model，而非 Django 自带的**），以及和它对应的 UserManager。
 
-Views: 实现了
+## Views
 
-- 传统登录（用户名 & 密码）
-- CAS 登录
+详情见 Swagger `auth`, `users` 和 `token`。
+
+实现了：
+
+- 传统登录（用户名 & 密码），返回 JWT 且设置 session 为登录态
+- CAS 登录（需要作为可点击的链接跳转），跳转到 next 参数对应的 URL（如果没有则为 /），将 JWT 放置于 cookie 中且设置 login=true，session 设置为登录态
 - 注销
 - 查看用户公开信息
-- 查看当前用户信息、修改当前用户信息。
+- 查看当前用户信息、修改当前用户信息
+- 更新 JWT，以及验证 JWT 有效性
+- 验证当前用户状态
 
 TODO:
 
 - 不允许从 CAS 使用 GID 登录。
-- 用户信息可见性相关设置（比较复杂）
+- ~~用户信息可见性相关设置（比较复杂）~~
 
-## 传统登录
+## Permissions
 
-`POST /api/auth/traditional_login`
+实现了 `ValidUserPermission`（所有接口默认的权限要求），`ValidUserOrReadOnlyPermission` 和 `IsSuperUser`。
 
-输入:
-
-| 字段 | 备注 |
-| -- | -- |
-| username | 用户名。不能为空。 |
-| password | 密码。不能为空。 |
-
-输出：
-
-| 字段 | 备注 |
-| -- | -- |
-| msg | 输出的信息。 |
-| new | 是否为（未补全信息的）新用户。仅在登录成功时有此字段。 |
-
-登录成功时，返回 HTTP 200，否则为 HTTP 401。
-
-## CAS 登录
-
-`GET /api/auth/cas_login`
-
-302 至 CAS 服务，进行下一步操作。
-
-验证成功：302 到 `/login=true&new=<是否为新用户>`，前端据此进一步操作。
-
-验证失败：返回 401，提示用户返回主页。（前端不需要处理这种情况。）
-
-## 注销
-
-`POST /api/auth/logout`
-
-无输入。
-
-输出：
-
-| 字段 | 备注 |
-| -- | -- |
-| msg | 输出的信息。 |
-
-总是成功（即使没有登录）。
-
-## 核验登录状态
-
-`POST /api/auth/check`
-
-无输入。
-
-输出：
-
-| 字段 | 备注 |
-| -- | -- |
-| login | 布尔值，是否登录。 |
-| new | 如果未登录，为 null；如果已经登录，为布尔值。 |
-
-## 查看用户公开信息
-
-`GET /api/users/public/`
-
-详见 Browsable API 页面。
-
-## 查看、修改自己的信息
-
-`GET/PUT/PATCH /api/users/current`
-
-详见 Browsable API 页面。
-
-## 关于 `account.utils` 中的权限
-
-`account.utils.ValidUserPermission` 用于判断用户是否补充了自己的信息（昵称和真实姓名），目前在 `settings.py` 中作为继承了 APIView 的默认 Permission 之一（另一个是判断是否登录了的）。
-
-`account.utils.ValidUserOrReadOnlyPermission` 是 `IsAuthenticatedOrReadOnly` 的一个 replacement。
-
-如果没有补充，默认访问会返回：
-
-```
-HTTP 403 Forbidden
-
-{
-    "detail": "需要补充用户信息（昵称与真实姓名）以使用剩余的功能。"
-}
-```
-
-（`ValidUserOrReadOnlyPermission` 的提示信息略有不同，不过都在 `detail` 里面）
-
-如果接口是任意用户均可访问的，那么在 APIView 类中设置：
+如果某个接口是所有人可使用的，设置：
 
 ```python
-permission_classes = []
+permission_classes: Sequence[Type[BasePermission]] = []
 ```
