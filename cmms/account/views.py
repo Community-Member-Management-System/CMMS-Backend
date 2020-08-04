@@ -97,7 +97,7 @@ class CASLoginView(BaseLoginView):
         if self.check_ticket():
             user = self.login(gid=self.gid, student_id=self.student_id, get_or_create=True)
             jwt = get_tokens_for_user(user)
-            response = redirect("/?login=true")
+            response = redirect(request.GET.get('next', '/'))
             response.set_cookie('refresh', jwt['refresh'])
             response.set_cookie('access', jwt['access'])
             return response
