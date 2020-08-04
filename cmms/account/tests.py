@@ -11,19 +11,25 @@ class LoginAndLogoutTests(APITestCase):
                                               password="test2", nick_name="myname", phone="123")
 
     def test_traditional_login_new_user(self):
+        # login as user1
         url = '/api/auth/traditional_login'
         data = {'username': 'teststuid', 'password': 'test'}
 
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.data['refresh']
+        assert response.data['access']
         return response.data
 
     def test_traditional_login_old_user(self):
+        # login as user2
         url = '/api/auth/traditional_login'
         data = {'username': 'PB23333333', 'password': 'test2'}
 
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.data['refresh']
+        assert response.data['access']
         return response.data
 
     def test_failed_traditional_login(self):
@@ -36,7 +42,7 @@ class LoginAndLogoutTests(APITestCase):
     # Sadly, CAS Login may be too hard to test.
 
     def test_get_all_users_info(self):
-        url = '/api/users/public/'
+        url = '/api/users/'
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -49,7 +55,7 @@ class LoginAndLogoutTests(APITestCase):
 
     def test_get_my_info(self):
         self.test_traditional_login_old_user()
-        url = '/api/users/current'
+        url = f'/api/users/{self.user2.id}/'
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
