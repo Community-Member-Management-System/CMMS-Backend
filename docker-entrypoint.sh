@@ -11,8 +11,6 @@ password = ${DB_PASSWORD:-cmms}
 %
 fi
 
-cd cmms
-
 if [ "$AUTO_MIGRATE" = "true" ]; then
   python3 manage.py migrate
 fi
