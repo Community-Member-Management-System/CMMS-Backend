@@ -1,4 +1,4 @@
-create database CMMS character set utf8mb4;
-create user 'cmms'@'localhost' identified by 'cmms';
-GRANT ALL ON CMMS.* to 'cmms'@'localhost';
-GRANT ALL ON CMMS_test.* to 'cmms'@'localhost';
+CREATE DATABASE CMMS CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'cmms'@'localhost' IDENTIFIED BY 'cmms';
+GRANT ALL PRIVILEGES ON CMMS.* to 'cmms'@'localhost';
+GRANT ALL PRIVILEGES ON CMMS_test.* to 'cmms'@'localhost';
