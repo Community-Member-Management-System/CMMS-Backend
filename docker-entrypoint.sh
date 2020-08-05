@@ -5,6 +5,7 @@ CONF=cmms/mysql.cnf
 if ! [ -e "$CONF" ]; then
   cat > "$CONF" << %
 [client]
+host = ${DB_HOST:-localhost}
 database = ${DB_NAME:-CMMS}
 user = ${DB_USER:-cmms}
 password = ${DB_PASSWORD:-cmms}
