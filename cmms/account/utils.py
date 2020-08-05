@@ -17,6 +17,10 @@ def valid_user_check(user: User) -> bool:
     return not is_new_user(user)
 
 
+def is_super_user(user: User) -> bool:
+    return bool(user and user.is_superuser)
+
+
 class ValidUserPermission(permissions.BasePermission):
     """
     A DRF permission, functioning same as valid_user_check()
@@ -42,4 +46,13 @@ class ValidUserOrReadOnlyPermission(permissions.BasePermission):
 
 class IsSuperUser(IsAdminUser):
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_superuser)
+        return is_super_user(request.user)
+
+
+class UserInfoPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return bool(
+            request.method in SAFE_METHODS or
+            obj == request.user or
+            is_super_user(request.user)
+        )

@@ -1,5 +1,6 @@
 from typing import Optional
 
+from rest_framework.fields import CharField, IntegerField
 from rest_framework.serializers import ModelSerializer, BooleanField, Serializer, SerializerMethodField
 from rest_framework.exceptions import ValidationError
 
@@ -31,7 +32,7 @@ class CommunitySerializer(ModelSerializer):
 
     class Meta:
         model = Community
-        fields = '__all__'
+        exclude = ('checklist',)
         read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins', 'valid', 'join_status']
 
 
@@ -132,3 +133,21 @@ class CommunityInvitationSerializer(ModelSerializer):
 class CommunityJoinResponseSerializer(Serializer):
     member = BooleanField(label='是否为社团成员')
     valid = BooleanField(label='是否为已通过审核状态')
+
+
+class CommunityCheckListSerializer(ModelSerializer):
+    class Meta:
+        model = Community
+        fields = ('checklist',)
+
+
+class CommunityCheckListCreateItemSerializer(Serializer):
+    contents = CharField(label='内容')
+
+
+class CommunityCheckListRemoveItemSerializer(Serializer):
+    idx = IntegerField(label='Index')
+
+
+class CommunityCheckListSetItemSerializer(CommunityCheckListRemoveItemSerializer, Serializer):
+    done = BooleanField(label='完成')

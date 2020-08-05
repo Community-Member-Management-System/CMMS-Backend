@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from . import views
 
 router = routers.SimpleRouter()
-router.register(r'users/public', views.ReadOnlyUserViewSet)
+router.register(r'users', views.UserViewSet)
 
 app_name = 'account'
 urlpatterns = [
@@ -15,7 +15,6 @@ urlpatterns = [
     path('auth/cas_login', views.CASLoginView.as_view(), name='cas_login'),
     path('auth/logout', views.LogoutView.as_view(), name='logout'),
     path('auth/check', views.LoginCheckView.as_view(), name='check'),
-    path('users/current', views.CurrentUserInfoView.as_view(), name='self_profile'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
 ]

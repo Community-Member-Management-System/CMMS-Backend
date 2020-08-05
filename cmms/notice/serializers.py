@@ -15,3 +15,8 @@ class NoticeBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoticeBox
         fields = ['pk', 'read', 'administrative']
+
+
+class NoticeViewSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(label='Notice ID')
+    method = serializers.CharField(label='read, unread, delete, or others')

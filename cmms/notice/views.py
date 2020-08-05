@@ -1,5 +1,7 @@
+from drf_yasg.utils import swagger_auto_schema
+
 from account.utils import ValidUserPermission
-from .serializers import NoticeSerializer, NoticeBoxSerializer
+from .serializers import NoticeSerializer, NoticeBoxSerializer, NoticeViewSerializer
 from .models import Notice, NoticeBox
 from .utils import NoticeManager
 from rest_framework.views import APIView
@@ -7,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from drf_yasg.utils import swagger_auto_schema
 
 
 class NoticeView(APIView):
@@ -25,11 +26,14 @@ class NoticeView(APIView):
         serializer = NoticeBoxSerializer(notice_list, many=True)
         return Response(serializer.data)
 
-    @swagger_auto_schema(responses={
-        200: NoticeSerializer,
-        204: "Done.",
-        404: "Notice does not exist or is deleted or user has not access to it."
-    })
+    @swagger_auto_schema(
+        request_body=NoticeViewSerializer,
+        responses={
+            200: NoticeSerializer,
+            204: "Done.",
+            404: "Notice does not exist or is deleted or user has not access to it."
+        }
+    )
     def post(self, request, format=None):
         user = request.user
         pk = request.data.get('pk')
@@ -44,4 +48,4 @@ class NoticeView(APIView):
             notice = NoticeManager.access(user, pk)
             serializer = NoticeSerializer(notice)
             return Response(serializer.data)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

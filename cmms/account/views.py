@@ -17,17 +17,19 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins, viewsets, generics, permissions
 from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from .models import User
 from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, DetailSerializer, \
     LoginSerializer, LoginResponseSerializer
-from .utils import is_new_user
+from .utils import is_new_user, UserInfoPermission, is_super_user
 from .token import get_tokens_for_user
 
 
@@ -82,7 +84,7 @@ class CASLoginView(BaseLoginView):
     permission_classes: Sequence[Type[BasePermission]] = []
 
     @swagger_auto_schema(responses={
-        302: 'Redirect to USTC CAS Server, or redirect to /',
+        302: 'Redirect to USTC CAS Server, or redirect to / (and set cookie "refresh", "access" and "login=true")',
         401: 'CAS Login failure'
     })
     def get(self, request):
@@ -166,21 +168,34 @@ class LoginCheckView(APIView):
         })
 
 
-class ReadOnlyUserViewSet(viewsets.ReadOnlyModelViewSet):
+@method_decorator(name='update', decorator=swagger_auto_schema(
+    request_body=CurrentUserInfoSerializer
+))
+@method_decorator(name='partial_update', decorator=swagger_auto_schema(
+    request_body=CurrentUserInfoSerializer
+))
+class UserViewSet(mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
     """
-    A simple viewset to show user public information
+    List, Retrieve and update user info. See PublicUserInfo and CurrentUserInfo (below) for response format.
     """
-    permission_classes: Sequence[Type[BasePermission]] = []
     queryset = User.objects.all()
-    serializer_class = PublicUserInfoSerializer
-
-
-class CurrentUserInfoView(generics.RetrieveUpdateAPIView):
-    """
-    A view for current user to get and modify his information
-    """
-    serializer_class = CurrentUserInfoSerializer
+    permission_classes = [UserInfoPermission]
     parser_classes = [MultiPartParser]
 
-    def get_object(self):
-        return self.request.user
+    def get_serializer_class(self):
+        if is_super_user(self.request.user):
+            return CurrentUserInfoSerializer
+        if self.action == 'list':
+            return PublicUserInfoSerializer
+        try:
+            user: User = self.get_object()
+            if user == self.request.user:
+                return CurrentUserInfoSerializer
+            else:
+                return PublicUserInfoSerializer
+        except AssertionError:
+            # fix complaining drf-yasg
+            return PublicUserInfoSerializer
