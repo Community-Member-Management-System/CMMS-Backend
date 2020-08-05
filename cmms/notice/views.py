@@ -1,5 +1,7 @@
+from drf_yasg.utils import swagger_auto_schema
+
 from account.utils import ValidUserPermission
-from .serializers import NoticeSerializer, NoticeBoxSerializer
+from .serializers import NoticeSerializer, NoticeBoxSerializer, NoticeViewSerializer
 from .models import Notice, NoticeBox
 from .utils import NoticeManager
 from rest_framework.views import APIView
@@ -12,12 +14,16 @@ from django.utils import timezone
 class NoticeView(APIView):
     permission_classes = [ValidUserPermission]
 
+    @swagger_auto_schema(responses={
+        200: NoticeBoxSerializer
+    })
     def get(self, request, format=None):
         user = request.user
         notice_list = NoticeManager.fetch(user)
         serializer = NoticeBoxSerializer(notice_list, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=NoticeViewSerializer)
     def post(self, request, format=None):
         user = request.user
         pk = request.data.get('pk')
