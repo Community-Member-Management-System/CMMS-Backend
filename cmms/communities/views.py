@@ -17,7 +17,8 @@ from account.utils import ValidUserOrReadOnlyPermission, IsSuperUser
 from .serializers import CommunitySerializer, OwnershipTransferSerializer, CommunitySimpleSerializer, \
     CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer, \
     CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer, \
-    CommunityJoinResponseSerializer
+    CommunityJoinResponseSerializer, CommunityCheckListSerializer, CommunityCheckListCreateItemSerializer, \
+    CommunityCheckListRemoveItemSerializer, CommunityCheckListSetItemSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin, IsOwner, IsUser
 from .models import Community, Invitation
 from notice.utils import NoticeManager
@@ -351,3 +352,72 @@ class CommunityAdminSetView(APIView):
             else:
                 raise NotAcceptable('此用户不在此社团中。')
             return Response(status=status.HTTP_200_OK)
+
+
+class CommunityCheckListViewSet(mixins.RetrieveModelMixin,
+                                viewsets.GenericViewSet):
+    permission_classes = [IsAdmin]
+    serializer_class = CommunityCheckListSerializer
+    queryset = Community.objects.filter(valid=True)
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return CommunityCheckListSerializer
+        elif self.action == 'create_item':
+            return CommunityCheckListCreateItemSerializer
+        elif self.action == 'remove_item':
+            return CommunityCheckListRemoveItemSerializer
+        else:
+            return CommunityCheckListSetItemSerializer
+
+    @swagger_auto_schema(responses={
+        200: CommunityCheckListSerializer
+    })
+    @action(detail=True, methods=['POST'])
+    def create_item(self, request, pk):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        contents = serializer.validated_data['contents']
+        with transaction.atomic():
+            community: Community = self.get_object()
+            community.checklist.append((contents, False))
+            community.save()
+        serializer = CommunityCheckListSerializer(instance=self.get_object())
+        return Response(serializer.data)
+
+    @swagger_auto_schema(responses={
+        200: CommunityCheckListSerializer
+    })
+    @action(detail=True, methods=['POST'])
+    def remove_item(self, request, pk):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        index = serializer.validated_data['idx']
+        try:
+            with transaction.atomic():
+                community: Community = self.get_object()
+                del community.checklist[index]
+                community.save()
+        except IndexError:
+            raise NotAcceptable('Index out of range')
+        serializer = CommunityCheckListSerializer(instance=self.get_object())
+        return Response(serializer.data)
+
+    @swagger_auto_schema(responses={
+        200: CommunityCheckListSerializer
+    })
+    @action(detail=True, methods=['POST'])
+    def set_item(self, request, pk):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        done = serializer.validated_data['done']
+        index = serializer.validated_data['idx']
+        try:
+            with transaction.atomic():
+                community: Community = self.get_object()
+                community.checklist[index][1] = done
+                community.save()
+        except IndexError:
+            raise NotAcceptable('Index out of range')
+        serializer = CommunityCheckListSerializer(instance=self.get_object())
+        return Response(serializer.data)

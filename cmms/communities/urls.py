@@ -23,6 +23,18 @@ urlpatterns = [
          views.CommunityAdminSetView.as_view(), name='admin_action'),
     path('<int:pk>/feed.ics', feed.CommunityEventCalendarFeed(), name='ics_feed'),
     path('<int:pk>/atom.xml', feed.CommunityEventRSSFeed(), name='rss_feed'),
+    path('<int:pk>/checklist', views.CommunityCheckListViewSet.as_view({
+        'get': 'retrieve',
+    }), name='checklist_retrieve'),
+    path('<int:pk>/checklist/create', views.CommunityCheckListViewSet.as_view({
+        'post': 'create_item',
+    }), name='checklist_create_item'),
+    path('<int:pk>/checklist/remove', views.CommunityCheckListViewSet.as_view({
+        'post': 'remove_item',
+    }), name='checklist_remove_item'),
+    path('<int:pk>/checklist/set', views.CommunityCheckListViewSet.as_view({
+        'post': 'set_item',
+    }), name='checklist_set_item'),
 ]
 
 urlpatterns += router.urls
