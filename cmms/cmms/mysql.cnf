@@ -1,0 +1,4 @@
+[client]
+database = CMMS
+user = cmms
+password = cmms  # test usage only!
