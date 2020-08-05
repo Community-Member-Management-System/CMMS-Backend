@@ -88,7 +88,8 @@ DATABASES = {
             'charset': 'utf8mb4',
         },
         'TEST': {
-            'NAME': 'CMMS_test'
+            'NAME': 'CMMS_test',
+            'CHARSET': 'utf8mb4'
         }
     }
 }
