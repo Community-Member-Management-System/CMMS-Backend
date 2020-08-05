@@ -137,3 +137,6 @@ cmms/uploads/
 
 # macOS
 .DS_Store
+
+# MySQL Config
+mysql.cnf

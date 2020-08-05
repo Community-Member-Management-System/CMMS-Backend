@@ -6,6 +6,10 @@
 
 ## Configuring Database
 
+```shell script
+cp cmms/cmms/mysql_example.cnf cmms/cmms/mysql.cnf
+```
+
 ```mysql
 create database CMMS character set utf8mb4;
 create user 'cmms'@'localhost' identified by 'cmms';

@@ -33,6 +33,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        cp cmms/cmms/mysql_example.cnf cmms/cmms/mysql.cnf
         sudo systemctl start mysql.service
         sudo mysql -uroot -proot < init.sql
     - name: Run Tests
