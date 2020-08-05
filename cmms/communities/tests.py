@@ -58,3 +58,69 @@ class CommunitiesTests(APITestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.client.logout()
+
+    def test_update_community(self):
+        url = f'/api/community/{self.club2.id}'
+        self.client.login(username='PB23333333', password='test2')
+
+        response = self.client.patch(url, {
+            'profile': 'fjwtql!!'
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['profile'], 'fjwtql!!')
+        response = self.client.patch(url, {
+            'profile': 'thisisclub2'
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.logout()
+
+    def test_destroy_community(self):
+        url = f'/api/community/{self.club2.id}'
+        self.client.login(username='PB23333333', password='test2')
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.club2 = self.create_community(user=self.user2, name='club2', profile='thisisclub2', valid=True)
+        self.client.logout()
+
+    def test_create_and_audit_community(self):
+        url = '/api/community/'
+        self.client.login(username='PB23333333', password='test2')
+
+        response = self.client.post(url, {
+            'name': 'ZJX Club',
+            'profile': 'zjxtql'
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        id = response.data['id']
+        self.client.logout()
+
+        self.client.login(username='sysadmin', password='sysadmin')
+        url = '/api/community/audit/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        url = f'/api/community/audit/{id}/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'ZJX Club')
+
+        response = self.client.put(url, {
+            'valid': True
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.logout()
+
+        self.client.login(username='PB23333333', password='test2')
+        url = '/api/community/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+
+        url = f'/api/community/{id}'
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.client.logout()
