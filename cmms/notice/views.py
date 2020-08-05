@@ -7,17 +7,29 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
 
 
 class NoticeView(APIView):
+    """
+    A view for get a list of personal notifications and details of one of them.
+    """
     permission_classes = [ValidUserPermission]
 
+    @swagger_auto_schema(responses={
+        200: NoticeBoxSerializer
+    })
     def get(self, request, format=None):
         user = request.user
         notice_list = NoticeManager.fetch(user)
         serializer = NoticeBoxSerializer(notice_list, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(responses={
+        200: NoticeSerializer,
+        204: "Done.",
+        404: "Notice does not exist or is deleted or user has not access to it."
+    })
     def post(self, request, format=None):
         user = request.user
         pk = request.data.get('pk')

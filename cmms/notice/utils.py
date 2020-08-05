@@ -1,7 +1,7 @@
 from .models import Notice, NoticeBox
 from django.conf import settings
 from django.utils import timezone
-from django.http import Http404, HttpResponseForbidden
+from django.http import Http404
 from account.models import User
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
