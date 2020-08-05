@@ -23,4 +23,6 @@ python manage.py set_user <superusername> <nickname> <realname>
 
 ```shell script
 python manage.py set_community <community_id>  # make a community valid
+python manage.py create_user <from> <to> <valid>  # create users from 'test{from}' to 'test{to}', set valid to 0 if invalid
+python manage.py create_community <from> <to> <user_id> <valid>  # create communities from 'test{from}' to 'test{to}' with owner as user_id, set valid to 0 if invalid
 ```
