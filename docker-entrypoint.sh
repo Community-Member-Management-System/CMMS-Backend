@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-CONF=cmms/cmms/mysql.cnf
+CONF=cmms/mysql.cnf
 
 if ! [ -e "$CONF" ]; then
   cat > "$CONF" << %
