@@ -34,7 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         sudo systemctl start mysql.service
-        sudo mysql -uroot < init.sql
+        sudo mysql -uroot -proot < init.sql
     - name: Run Tests
       working-directory: ./cmms
       run: |
