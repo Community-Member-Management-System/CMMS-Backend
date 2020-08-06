@@ -107,7 +107,8 @@ class CommunitySysAdminAuditSerializer(ModelSerializer):
 def get_community_non_members_list(community) -> 'QuerySet[User]':
     users = User.objects.all()
     members = community.members.all()
-    return users.difference(members)
+    # return users.difference(members)
+    return users.exclude(id__in=members)  # MySQL is bad.
 
 
 class CommunityInviteSerializer(ModelSerializer):
