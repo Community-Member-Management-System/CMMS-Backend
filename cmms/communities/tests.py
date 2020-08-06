@@ -184,3 +184,155 @@ class CommunitiesTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['non_members']), 2)
+        url = f'/api/community/{self.club2.id}/invite/{self.user1.id}'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.logout()
+
+        url = f'/api/community/invitation/'
+        self.login_as_user(self.user1)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        invitation_id = response.data[0]['id']
+
+        url = f'/api/community/invitation/{invitation_id}/accept/'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        url = f'/api/community/{self.club2.id}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['members']), 2)
+
+        url = f'/api/community/{self.club2.id}/join'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'member': True,
+            'valid': True
+        })
+        response = self.client.post(url, {
+            'join': False
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'member': False,
+            'valid': False
+        })
+        self.client.logout()
+
+    def test_checklist(self):
+        url = f'/api/community/{self.club1.id}/checklist'
+        self.login_as_user(self.user1)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': []
+        })
+        response = self.client.post(url + '/create', {
+            'contents': 'fjwtql'
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': [['fjwtql', False]]
+        })
+        response = self.client.post(url + '/create', {
+            'contents': 'zjxtql'
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': [['fjwtql', False], ['zjxtql', False]]
+        })
+        response = self.client.post(url + '/swap', {
+            'index_from': 0,
+            'index_to': 1
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': [['zjxtql', False], ['fjwtql', False]]
+        })
+        response = self.client.post(url + '/set', {
+            'index': 0,
+            'done': True
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': [['zjxtql', True], ['fjwtql', False]]
+        })
+        response = self.client.post(url + '/remove', {
+            'index': 0
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': [['fjwtql', False]]
+        })
+        response = self.client.post(url + '/remove', {
+            'index': 0
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'checklist': []
+        })
+        self.client.logout()
+
+    def test_set_admin_and_transfer(self):
+        url = f'/api/community/{self.club1.id}/join'
+        self.login_as_user(self.user2)
+        response = self.client.post(url, {
+            'join': True
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.logout()
+        self.login_as_user(self.user1)
+        url = f'/api/community/{self.club1.id}/audit/{self.user2.id}/allow'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        url = f'/api/community/{self.club1.id}/members/{self.user2.id}/admin/set'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        url = f'/api/community/{self.club1.id}/transfer'
+
+        response = self.client.put(url, {
+            'owner': self.user2.id
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'owner': self.user2.id
+        })
+        response = self.client.put(url, {
+            'owner': self.user1.id
+        })
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.client.logout()
+        self.login_as_user(self.user2)
+        response = self.client.put(url, {
+            'owner': self.user1.id
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'owner': self.user1.id
+        })
+        self.client.logout()
+        self.login_as_user(self.user1)
+        url = f'/api/community/{self.club1.id}/members/{self.user2.id}/admin/unset'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        url = f'/api/community/{self.club1.id}/members/{self.user2.id}'
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.client.logout()

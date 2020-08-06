@@ -147,8 +147,13 @@ class CommunityCheckListCreateItemSerializer(Serializer):
 
 
 class CommunityCheckListRemoveItemSerializer(Serializer):
-    idx = IntegerField(label='Index')
+    index = IntegerField(label='Index')
 
 
 class CommunityCheckListSetItemSerializer(CommunityCheckListRemoveItemSerializer, Serializer):
     done = BooleanField(label='完成')
+
+
+class CommunityCheckListMoveItemSerializer(Serializer):
+    index_from = IntegerField(label='From...')
+    index_to = IntegerField(label='To...')

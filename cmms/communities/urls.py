@@ -35,6 +35,9 @@ urlpatterns = [
     path('<int:pk>/checklist/set', views.CommunityCheckListViewSet.as_view({
         'post': 'set_item',
     }), name='checklist_set_item'),
+    path('<int:pk>/checklist/swap', views.CommunityCheckListViewSet.as_view({
+        'post': 'move_item',
+    }), name='checklist_move_item'),
 ]
 
 urlpatterns += router.urls
