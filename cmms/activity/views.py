@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.parsers import JSONParser
 from .serializers import ActivitySerializer, ActivityUpdateSerializer, ActivitySecretKeySerializer,\
-                         ActivityOTPSerializer
+    ActivityOTPSerializer
 from .permissions import IsAdminOrReadOnly
 from .models import Activity, verify_otp
 from account.utils import ValidUserOrReadOnlyPermission, ValidUserPermission

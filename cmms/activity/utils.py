@@ -44,4 +44,3 @@ class ActivityManager:
 
     def get_comment_by_user(self, user):
         return self.__comment_manager.filter(related_user=user)
-

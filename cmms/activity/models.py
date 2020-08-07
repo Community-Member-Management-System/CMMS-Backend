@@ -47,5 +47,3 @@ class Comment(models.Model):
     date = models.DateTimeField(default=timezone.now, verbose_name=_('评论时间'))
     title = models.TextField(verbose_name=_('评论标题'))
     content = models.TextField(verbose_name=_('评论内容'))
-
-
