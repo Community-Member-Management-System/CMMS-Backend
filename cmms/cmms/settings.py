@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+try:
+    from . import local_settings as local
+except ImportError:
+    from . import default_settings as local
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,10 +25,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm-e7!9lv=s%)7nbth%@i94=txyetdqsy-r^=6j%3aon@s(2yez'
+SECRET_KEY = local.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = local.DEBUG
 
 ALLOWED_HOSTS = ['*']
 
@@ -79,20 +84,7 @@ WSGI_APPLICATION = 'cmms.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': 'cmms/mysql.cnf',
-            'charset': 'utf8mb4',
-        },
-        'TEST': {
-            'NAME': 'CMMS_test',
-            'CHARSET': 'utf8mb4'
-        }
-    }
-}
+DATABASES = local.DATABASES
 
 
 # Password validation
@@ -169,3 +161,4 @@ EMAIL_USE_SSL = False
 # uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 MEDIA_URL = '/uploads/'
+
