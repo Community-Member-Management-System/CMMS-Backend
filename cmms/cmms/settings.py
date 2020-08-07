@@ -162,3 +162,5 @@ EMAIL_USE_SSL = False
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 MEDIA_URL = '/uploads/'
 
+# TOTP
+TOTP_INTERVAL = 30

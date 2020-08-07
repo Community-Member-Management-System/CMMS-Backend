@@ -1,4 +1,4 @@
-from .models import Activity, Comment
+from activity.models import Activity, Comment
 from django.conf import settings
 from django.utils import timezone
 
@@ -44,3 +44,4 @@ class ActivityManager:
 
     def get_comment_by_user(self, user):
         return self.__comment_manager.filter(related_user=user)
+
