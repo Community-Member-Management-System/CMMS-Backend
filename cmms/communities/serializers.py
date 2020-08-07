@@ -8,6 +8,7 @@ from django.db.models.query import QuerySet
 
 from account.models import User
 from .models import Community, Invitation
+from activity.serializers import ActivitySerializer
 
 
 class CommunitySerializer(ModelSerializer):
@@ -16,6 +17,7 @@ class CommunitySerializer(ModelSerializer):
     """
     members = SerializerMethodField()
     join_status = SerializerMethodField()
+    activities = SerializerMethodField()
 
     def get_members(self, community: Community):
         valid_members = community.members.filter(membership__valid=True)
@@ -30,10 +32,14 @@ class CommunitySerializer(ModelSerializer):
         user: Optional[User] = self.context.get('user')
         return community.display_member_status(user)
 
+    def get_activities(self, community: Community):
+        return community.activity_set.all().values_list('pk', flat=True)
+
     class Meta:
         model = Community
         exclude = ('checklist',)
-        read_only_fields = ['creator', 'owner', 'date_created', 'members', 'admins', 'valid', 'join_status']
+        read_only_fields = ['creator', 'owner', 'date_created', 'members',
+                            'admins', 'valid', 'join_status', 'activities']
 
 
 class OwnershipTransferSerializer(ModelSerializer):
