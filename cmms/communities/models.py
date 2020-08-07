@@ -58,7 +58,7 @@ class Community(models.Model):
     avatar = models.ImageField(upload_to=community_avatar_path, verbose_name=_("头像"), blank=True)
     valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
-    checklist = models.JSONField(
+    checklist = models.JSONField(  # type: ignore
         default=list,
         verbose_name=_('待办清单 JSON')
     )
