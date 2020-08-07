@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'notice.apps.NoticeConfig',
     'activity.apps.ActivityConfig',
     'drf_yasg',
-    'django_mysql',
 ]
 
 MIDDLEWARE = [

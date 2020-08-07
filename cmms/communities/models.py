@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django_mysql.models import JSONField
 
 from account.models import User
 from typing import Optional
@@ -59,7 +58,7 @@ class Community(models.Model):
     avatar = models.ImageField(upload_to=community_avatar_path, verbose_name=_("头像"), blank=True)
     valid = models.BooleanField(default=False, verbose_name=_('社团是否通过审核'))
 
-    checklist = JSONField(
+    checklist = models.JSONField(
         default=list,
         verbose_name=_('待办清单 JSON')
     )
