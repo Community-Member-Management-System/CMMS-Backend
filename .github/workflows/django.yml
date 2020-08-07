@@ -36,9 +36,12 @@ jobs:
         cp cmms/cmms/mysql_example.cnf cmms/cmms/mysql.cnf
         sudo systemctl start mysql.service
         sudo mysql -uroot -proot < init.sql
+    - name: Lint code
+      working-directory: ./cmms
+      run: flake8 ./
+    - name: Static typing check
+      working-directory: ./cmms
+      run: mypy ./
     - name: Run Tests
       working-directory: ./cmms
-      run: |
-        flake8
-        mypy .
-        python manage.py test
+      run: python manage.py test

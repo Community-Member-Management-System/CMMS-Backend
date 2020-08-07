@@ -10,3 +10,4 @@ django-ical~=1.7.1
 drf-yasg~=1.17.1
 djangorestframework-simplejwt~=4.4.0
 mysqlclient~=2.0.1
+pyotp~=2.4.0
