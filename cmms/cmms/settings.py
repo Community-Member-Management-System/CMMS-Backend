@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 try:
-    from . import local_settings as local
+    from . import local_settings as local  # type: ignore
 except ImportError:
     from . import default_settings as local
 
@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'notice.apps.NoticeConfig',
     'activity.apps.ActivityConfig',
     'drf_yasg',
-    'django_mysql',
 ]
 
 MIDDLEWARE = [
