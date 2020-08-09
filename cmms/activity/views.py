@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework import generics
@@ -31,8 +32,9 @@ class ActivityListView(generics.ListCreateAPIView):
         return Activity.objects.filter(related_community__pk=community).all()
 
     def perform_create(self, serializer):
-        activity = serializer.save()
-        NoticeManager.create_notice_C_AN(activity, subtype=0)
+        with transaction.atomic():
+            activity = serializer.save()
+            NoticeManager.create_notice_C_AN(activity, subtype=0)
 
 
 class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -42,8 +44,9 @@ class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Activity.objects.all()
 
     def perform_update(self, serializer):
-        activity = serializer.save()
-        NoticeManager.create_notice_C_AN(activity.related_community, '活动信息已被更新')
+        with transaction.atomic():
+            activity = serializer.save()
+            NoticeManager.create_notice_C_AN(activity.related_community, subtype=1)
 
 
 class ActivitySecretKeyView(generics.RetrieveAPIView):
