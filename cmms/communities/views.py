@@ -72,7 +72,7 @@ class CommunityRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance: Community) -> None:  # type: ignore
         request: Request = self.request  # type: ignore
-        description = request.data.get('description')
+        description = str(request.data.get('description'))
         with transaction.atomic():
             NoticeManager.create_notice_C_D(
                 related_community=instance,
