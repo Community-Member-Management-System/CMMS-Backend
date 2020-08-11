@@ -1,4 +1,4 @@
-from .models import Activity, Comment
+from activity.models import Activity, Comment
 from django.conf import settings
 from django.utils import timezone
 

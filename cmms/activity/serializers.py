@@ -48,9 +48,20 @@ class ActivityUpdateSerializer(BaseActivitySerializer):
             'description',
             'start_time',
             'end_time',
-            'signed_in_users',
+            'signed_in_users',  # TODO: Do we need another API to sign in users incrementally? E.g., sign in users [1,2]
             'created_date',
             'status',
         ]
 
-        read_only_fields = ['created_date', 'status', 'signed_in_users', 'related_community']
+        read_only_fields = ['created_date', 'status', 'related_community']
+
+
+class ActivitySecretKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+
+        fields = ['secret_key']
+
+
+class ActivityOTPSerializer(serializers.Serializer):
+    otp = serializers.CharField()

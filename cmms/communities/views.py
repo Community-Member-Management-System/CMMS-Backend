@@ -18,7 +18,7 @@ from .serializers import CommunitySerializer, OwnershipTransferSerializer, Commu
     CommunityJoinSerializer, CommunityNewMemberAuditSerializer, CommunitySysAdminAuditSerializer, \
     CommunityInviteSerializer, get_community_non_members_list, CommunityInvitationSerializer, \
     CommunityJoinResponseSerializer, CommunityCheckListSerializer, CommunityCheckListCreateItemSerializer, \
-    CommunityCheckListRemoveItemSerializer, CommunityCheckListSetItemSerializer
+    CommunityCheckListRemoveItemSerializer, CommunityCheckListSetItemSerializer, CommunityCheckListMoveItemSerializer
 from .permissions import IsOwnerOrReadOnly, IsAdmin, IsOwner, IsUser
 from .models import Community, Invitation
 from notice.utils import NoticeManager
@@ -72,7 +72,7 @@ class CommunityRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance: Community) -> None:  # type: ignore
         request: Request = self.request  # type: ignore
-        description = request.data.get('description')
+        description = str(request.data.get('description'))
         with transaction.atomic():
             NoticeManager.create_notice_C_D(
                 related_community=instance,
@@ -83,7 +83,7 @@ class CommunityRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
 class CommunityTransferView(generics.UpdateAPIView):
     """
-    Transfer valid community owner to others (for owner only)
+    Transfer valid community owner to other community admins (for owner only)
     """
     permission_classes = [ValidUserOrReadOnlyPermission,
                           IsOwnerOrReadOnly]
@@ -367,6 +367,8 @@ class CommunityCheckListViewSet(mixins.RetrieveModelMixin,
             return CommunityCheckListCreateItemSerializer
         elif self.action == 'remove_item':
             return CommunityCheckListRemoveItemSerializer
+        elif self.action == 'move_item':
+            return CommunityCheckListMoveItemSerializer
         else:
             return CommunityCheckListSetItemSerializer
 
@@ -392,7 +394,7 @@ class CommunityCheckListViewSet(mixins.RetrieveModelMixin,
     def remove_item(self, request, pk):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        index = serializer.validated_data['idx']
+        index = serializer.validated_data['index']
         try:
             with transaction.atomic():
                 community: Community = self.get_object()
@@ -411,11 +413,34 @@ class CommunityCheckListViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         done = serializer.validated_data['done']
-        index = serializer.validated_data['idx']
+        index = serializer.validated_data['index']
         try:
             with transaction.atomic():
                 community: Community = self.get_object()
                 community.checklist[index][1] = done
+                community.save()
+        except IndexError:
+            raise NotAcceptable('Index out of range')
+        serializer = CommunityCheckListSerializer(instance=self.get_object())
+        return Response(serializer.data)
+
+    @swagger_auto_schema(responses={
+        200: CommunityCheckListSerializer
+    })
+    @action(detail=True, methods=['POST'])
+    def move_item(self, request, pk):
+        """
+        Swap two elements
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        index_from = serializer.validated_data['index_from']
+        index_to = serializer.validated_data['index_to']
+        try:
+            with transaction.atomic():
+                community: Community = self.get_object()
+                community.checklist[index_from], community.checklist[index_to] = \
+                    community.checklist[index_to], community.checklist[index_from]
                 community.save()
         except IndexError:
             raise NotAcceptable('Index out of range')
