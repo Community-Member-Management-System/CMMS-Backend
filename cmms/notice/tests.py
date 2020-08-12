@@ -64,7 +64,7 @@ class NoticeTest(APITestCase):
     def login_sysadmin(self):
         self.client.login(username='test4', password='test4')
 
-    def check(self, user: User, notice: Notice) -> bool:
+    def check(self, user: AbstractUser, notice: Notice) -> bool:
         self.login_as_user(user)
         serialized_data = NoticeSerializer(notice).data
         url = '/api/notice/'
