@@ -140,3 +140,7 @@ cmms/uploads/
 
 # MySQL Config
 mysql.cnf
+
+# venv
+bin/
+pyvenv.cfg
