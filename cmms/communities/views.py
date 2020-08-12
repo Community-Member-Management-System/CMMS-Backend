@@ -32,6 +32,7 @@ class CommunityListView(generics.ListCreateAPIView):
     serializer_class = CommunitySimpleSerializer
     queryset = Community.objects.filter(valid=True)
     parser_classes = [MultiPartParser]
+    search_fields = ['name', 'profile']
 
     def perform_create(self, serializer):
         with transaction.atomic():
