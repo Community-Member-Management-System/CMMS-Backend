@@ -58,7 +58,7 @@ class NoticeTest(APITestCase):
             start_time=self.time,
             end_time=self.time)
 
-    def login_as_user(self, user: User):
+    def login_as_user(self, user: AbstractUser):
         self.client.force_login(user)
 
     def login_sysadmin(self):
