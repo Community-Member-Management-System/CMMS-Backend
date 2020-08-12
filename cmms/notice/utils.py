@@ -34,7 +34,8 @@ class NoticeManager:
 
     # 生成邮件内容
     @classmethod
-    def __create_email_subject(cls, community: Community, subtype: int, title: str) -> str:
+    def __create_email_subject(cls, community: Community, subtype: int,
+                               title: str) -> str:
         header = community.name + '社团管理员' + cls.__C_AN_subtype_map[
             subtype] + '活动：'
         return settings.DEFAULT_EMAIL_PREFIX + header + title
@@ -63,16 +64,21 @@ class NoticeManager:
     @classmethod
     def __create_notice_C_A(cls, community: Community, notice: Notice) -> None:
         for admin in community.admins.all():
-            cls.__notice_box_manager.create(user=admin, notice=notice, administrative=True)
+            cls.__notice_box_manager.create(user=admin,
+                                            notice=notice,
+                                            administrative=True)
 
     @classmethod
     def __create_notice_S(cls, notice: Notice) -> None:
         for superuser in cls.__user_manager.filter(is_superuser=True):
-            cls.__notice_box_manager.create(user=superuser, notice=notice, administrative=True)
+            cls.__notice_box_manager.create(user=superuser,
+                                            notice=notice,
+                                            administrative=True)
 
     # 创建 Notice 的方法
     @classmethod
-    def create_notice_PC(cls, related_user: User, related_community: Community, subtype: int) -> Notice:
+    def create_notice_PC(cls, related_user: User, related_community: Community,
+                         subtype: int) -> Notice:
         type = 'PC'
         new_notice = cls.__notice_manager.create(
             type=type,
@@ -83,7 +89,8 @@ class NoticeManager:
         return new_notice
 
     @classmethod
-    def create_notice_AR(cls, related_user: User, related_comment: Comment, subtype: int) -> Notice:
+    def create_notice_AR(cls, related_user: User, related_comment: Comment,
+                         subtype: int) -> Notice:
         type = 'AR'
         new_notice = cls.__notice_manager.create(
             type=type,
@@ -116,7 +123,9 @@ class NoticeManager:
         return new_notice
 
     @classmethod
-    def create_notice_B(cls, related_user: User, description: str = '') -> Notice:
+    def create_notice_B(cls,
+                        related_user: User,
+                        description: str = '') -> Notice:
         type = 'B'
         new_notice = cls.__notice_manager.create(type=type,
                                                  related_user=related_user,
@@ -125,7 +134,10 @@ class NoticeManager:
         return new_notice
 
     @classmethod
-    def create_notice_C_AN(cls, related_activity: Activity, subtype: int, if_send_mail: bool = False) -> Notice:
+    def create_notice_C_AN(cls,
+                           related_activity: Activity,
+                           subtype: int,
+                           if_send_mail: bool = False) -> Notice:
         type = 'C_AN'
         related_community = related_activity.related_community
         new_notice = cls.__notice_manager.create(
@@ -137,14 +149,14 @@ class NoticeManager:
                                                  related_activity.title)
             message = cls.__create_email_message(related_activity)
             recipient_list = [
-                member.email for member in related_community.members.all() if member.email
+                member.email for member in related_community.members.all()
+                if member.email
             ]
-            if not recipient_list:
-                return
-            send_mail(subject=subject,
-                      message=message,
-                      recipient_list=recipient_list,
-                      from_email=settings.DEFAULT_FROM_EMAIL)
+            if recipient_list:
+                send_mail(subject=subject,
+                          message=message,
+                          recipient_list=recipient_list,
+                          from_email=settings.DEFAULT_FROM_EMAIL)
         return new_notice
 
     @classmethod
@@ -178,7 +190,9 @@ class NoticeManager:
         return new_notice
 
     @classmethod
-    def create_notice_C_D(cls, related_community: Community, description: str = '') -> Notice:
+    def create_notice_C_D(cls,
+                          related_community: Community,
+                          description: str = '') -> Notice:
         type = 'C_D'
         new_notice = cls.__notice_manager.create(
             type=type,
@@ -188,7 +202,9 @@ class NoticeManager:
         return new_notice
 
     @classmethod
-    def create_notice_S_CA(cls, related_user: User, description: str = '') -> Notice:
+    def create_notice_S_CA(cls,
+                           related_user: User,
+                           description: str = '') -> Notice:
         type = 'S_CA'
         new_notice = cls.__notice_manager.create(type=type,
                                                  related_user=related_user,

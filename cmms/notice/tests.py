@@ -58,7 +58,7 @@ class NoticeTest(APITestCase):
             start_time=self.time,
             end_time=self.time)
 
-    def login_as_user(self, user: AbstractUser):
+    def login_as_user(self, user: User):
         self.client.force_login(user)
 
     def login_sysadmin(self):
@@ -70,7 +70,7 @@ class NoticeTest(APITestCase):
         url = '/api/notice/'
         boxResponse = self.client.get(url).data
 
-        for box in boxResponse:
+        for box in boxResponse:  # type: ignore
             noticeResponse = self.client.post(url, {'pk': int(box['pk'])}).data
 
             if noticeResponse == serialized_data:
@@ -84,7 +84,7 @@ class NoticeTest(APITestCase):
         url = '/api/notice/'
         boxResponse = self.client.get(url).data
 
-        for box in boxResponse:
+        for box in boxResponse:  # type: ignore
             noticeResponse = self.client.post(url, {'pk': int(box['pk'])}).data
 
             if noticeResponse == serialized_data:
