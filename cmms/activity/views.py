@@ -17,6 +17,7 @@ class ActivityListView(generics.ListCreateAPIView):
     serializer_class = ActivitySerializer
     permission_classes = [IsAdminOrReadOnly,
                           ValidUserOrReadOnlyPermission]
+    search_fields = ['title', 'description']
 
     def get_queryset(self):
         community = self.request.query_params.get('community', None)

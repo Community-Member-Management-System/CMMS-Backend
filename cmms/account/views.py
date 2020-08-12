@@ -184,6 +184,7 @@ class UserViewSet(mixins.ListModelMixin,
     queryset = User.objects.all()
     permission_classes = [UserInfoPermission]
     parser_classes = [MultiPartParser]
+    search_fields = ['nick_name', 'profile']
 
     def get_serializer_class(self):
         if is_super_user(self.request.user):
