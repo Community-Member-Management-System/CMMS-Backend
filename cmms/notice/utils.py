@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .models import Notice, NoticeBox
 from django.conf import settings
 from django.utils import timezone
@@ -103,7 +105,7 @@ class NoticeManager:
     @classmethod
     def create_notice_CA(cls,
                          related_user: User,
-                         related_community: Community,
+                         related_community: Optional[Community],
                          subtype: int,
                          description: str = '') -> Notice:
         type = 'CA'

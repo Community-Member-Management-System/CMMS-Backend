@@ -196,7 +196,7 @@ class CommunitySysAdminAuditViewSet(mixins.ListModelMixin,
                                     mixins.RetrieveModelMixin,
                                     viewsets.GenericViewSet):
     """
-    A view for sysadmin to audit new communities
+    A view for sysadmin to audit new communities (won't delete any communities)
     """
     permission_classes = [IsSuperUser]
     serializer_class = CommunitySysAdminAuditSerializer
