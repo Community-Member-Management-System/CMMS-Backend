@@ -164,7 +164,8 @@ class LoginCheckView(APIView):
         return Response({
             "login": request.user.is_authenticated,
             "new": None if not request.user.is_authenticated else is_new_user(request.user),
-            "userid": None if not request.user.is_authenticated else request.user.id
+            "userid": None if not request.user.is_authenticated else request.user.id,
+            "superuser": request.user.is_superuser
         })
 
 

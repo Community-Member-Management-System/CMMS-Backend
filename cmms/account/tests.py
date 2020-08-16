@@ -78,7 +78,8 @@ class LoginAndLogoutTests(APITestCase):
         self.assertEqual(response.data, {
             'login': False,
             'new': None,
-            'userid': None
+            'userid': None,
+            'superuser': False,
         })
 
         self.test_traditional_login_old_user()
@@ -87,5 +88,6 @@ class LoginAndLogoutTests(APITestCase):
         self.assertEqual(response.data, {
             'login': True,
             'new': False,
-            'userid': self.user2.id
+            'userid': self.user2.id,
+            'superuser': False
         })
