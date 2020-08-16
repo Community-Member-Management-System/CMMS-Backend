@@ -42,6 +42,7 @@ class NewUserSerializer(serializers.Serializer):
 class UserCheckSerializer(NewUserSerializer, serializers.Serializer):
     login = serializers.BooleanField(label='是否已经登录')
     userid = serializers.IntegerField(label='用户 ID')
+    superuser = serializers.BooleanField(label='是否为超级用户')
 
 
 class DetailSerializer(serializers.Serializer):
