@@ -1,3 +1,5 @@
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.db import transaction
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -18,6 +20,28 @@ class ActivityListView(generics.ListCreateAPIView):
     permission_classes = [IsAdminOrReadOnly,
                           ValidUserOrReadOnlyPermission]
     search_fields = ['title', 'description']
+
+    @swagger_auto_schema(
+        responses={
+            200: ActivitySerializer
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'community',
+                openapi.IN_QUERY,
+                description='list activities by commuinty',
+                type=openapi.TYPE_INTEGER
+            ),
+            openapi.Parameter(
+                'only_mine',
+                openapi.IN_QUERY,
+                description='only list the activities in which the user joined if the parameter exists',
+                type=openapi.TYPE_INTEGER
+            )
+        ]
+    )
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         community = self.request.query_params.get('community', None)
