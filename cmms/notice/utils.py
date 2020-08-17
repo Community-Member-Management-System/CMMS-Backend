@@ -156,7 +156,8 @@ class NoticeManager:
                     send_mail(subject=subject,
                               message=message,
                               recipient_list=recipient_list,
-                              from_email=settings.DEFAULT_FROM_EMAIL)
+                              from_email=settings.DEFAULT_FROM_EMAIL,
+                              fail_silently=True)
         return new_notice
 
     @classmethod
