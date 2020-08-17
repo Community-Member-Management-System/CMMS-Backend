@@ -150,15 +150,13 @@ class NoticeManager:
             subject = cls.__create_email_subject(related_community, subtype,
                                                  related_activity.title)
             message = cls.__create_email_message(related_activity)
-            recipient_list = [
-                member.email for member in related_community.members.all()
-                if member.email
-            ]
-            if recipient_list:
-                send_mail(subject=subject,
-                          message=message,
-                          recipient_list=recipient_list,
-                          from_email=settings.DEFAULT_FROM_EMAIL)
+            for member in related_community.members.all():
+                if member.email:
+                    recipient_list = [member.email]
+                    send_mail(subject=subject,
+                              message=message,
+                              recipient_list=recipient_list,
+                              from_email=settings.DEFAULT_FROM_EMAIL)
         return new_notice
 
     @classmethod
