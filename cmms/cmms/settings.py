@@ -149,6 +149,9 @@ REST_FRAMEWORK = {
 }
 
 ENABLE_EMAIL = False
+if DEBUG:
+    ENABLE_EMAIL = True
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 EMAIL_HOST = 'localhost'
 EMAIL_HOST_USER = ''
