@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -61,6 +62,16 @@ class Community(models.Model):
     checklist = models.JSONField(  # type: ignore
         default=list,
         verbose_name=_('待办清单 JSON')
+    )
+
+    rec_link = models.URLField(
+        verbose_name='睿客网链接',
+        blank=True,
+        validators=[RegexValidator(
+                regex=r'http[s]?://rec.ustc.edu.cn/.+',
+                message='请输入睿客网链接（以 http(s)://rec.ustc.edu.cn/ 开头）。'
+            )
+        ]
     )
 
     def get_member_status(self, user: Optional[User]) -> MemberStatusDictType:
