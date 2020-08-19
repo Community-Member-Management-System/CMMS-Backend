@@ -14,7 +14,6 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import TypedDict
 
-
 MemberStatusDictType = TypedDict('MemberStatusDictType', {
     'member': bool,
     'valid': bool
@@ -68,10 +67,9 @@ class Community(models.Model):
         verbose_name='睿客网链接',
         blank=True,
         validators=[RegexValidator(
-                regex=r'http[s]?://rec.ustc.edu.cn/.+',
-                message='请输入睿客网链接（以 http(s)://rec.ustc.edu.cn/ 开头）。'
-            )
-        ]
+            regex=r'http[s]?://rec.ustc.edu.cn/.+',
+            message='请输入睿客网链接（以 http(s)://rec.ustc.edu.cn/ 开头）。'
+        )]
     )
 
     def get_member_status(self, user: Optional[User]) -> MemberStatusDictType:
