@@ -71,7 +71,7 @@ class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         with transaction.atomic():
             activity = serializer.save()
-            NoticeManager.create_notice_C_AN(activity.related_community, subtype=1)
+            NoticeManager.create_notice_C_AN(activity, subtype=1)
 
 
 class ActivitySecretKeyView(generics.RetrieveAPIView):
