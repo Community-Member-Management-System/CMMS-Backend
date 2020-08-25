@@ -16,7 +16,7 @@ def verify_otp(secret_key, otp):
         interval = 30
 
     totp = pyotp.TOTP(secret_key, interval=interval)
-    return totp.verify(otp)
+    return totp.verify(otp, valid_window=1)
 
 
 class Activity(models.Model):

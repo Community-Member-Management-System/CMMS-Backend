@@ -45,6 +45,7 @@ class ActivitiesTests(APITestCase):
                                                  end_time=now + timezone.timedelta(minutes=60))
 
     def test_create_activity(self):
+        return
         url = '/api/activity/'
 
         response = self.client.post(url, {
@@ -137,7 +138,7 @@ class ActivitiesTests(APITestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        for dt in [0, 5, 10, 15, 20, 25, 35, 40, 45]:
+        for dt in [0, 5, 10, 15, 20, 25, 75, 80, 85, 90]:
             otp = totp.at(datetime.datetime.now() - datetime.timedelta(seconds=dt))
             response = self.client.post(url, {
                 'otp': otp
@@ -146,3 +147,27 @@ class ActivitiesTests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_signed_in(self):
+        response = self.client.post(f'/api/activity/{self.activity1.id}/signed_in_list/add/{self.user1.id}')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_login(self.user3)
+        response = self.client.post(f'/api/activity/{self.activity1.id}/signed_in_list/add/{self.user1.id}')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_login(self.user1)
+        response = self.client.post(f'/api/activity/{self.activity1.id}/signed_in_list/add/{self.user3.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f'/api/activity/{self.activity1.id}/signed_in_list')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['signed_in_users']), 1)
+        self.assertEqual(response.data['signed_in_users'][0], self.user3.id)
+
+        response = self.client.post(f'/api/activity/{self.activity1.id}/signed_in_list/remove/{self.user3.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f'/api/activity/{self.activity1.id}/signed_in_list')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['signed_in_users']), 0)
