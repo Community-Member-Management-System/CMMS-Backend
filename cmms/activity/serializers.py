@@ -1,3 +1,5 @@
+from typing import Union
+
 from .models import Activity
 from rest_framework import serializers
 from django.utils import timezone
@@ -8,7 +10,8 @@ from communities.models import Community
 class BaseActivitySerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField('get_status')
     signed_in_users = serializers.SerializerMethodField('get_signed_in_users')
-    related_community = CommunitySimpleSerializer()
+    related_community: 'Union[CommunitySimpleSerializer, serializers.PrimaryKeyRelatedField]' \
+        = CommunitySimpleSerializer()
 
     def get_status(self, activity: Activity):
         now = timezone.now()

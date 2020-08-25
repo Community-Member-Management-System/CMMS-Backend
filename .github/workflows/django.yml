@@ -44,4 +44,4 @@ jobs:
       run: mypy ./
     - name: Run Tests
       working-directory: ./cmms
-      run: python manage.py test
+      run: python -W ignore manage.py test
