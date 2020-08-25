@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from rest_framework import generics, mixins, viewsets
 from rest_framework import permissions
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -64,6 +65,8 @@ class ActivityListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         with transaction.atomic():
             activity = serializer.save()
+            if not activity.related_community.admins.filter(id=self.request.user.id).exists():
+                raise PermissionDenied
             NoticeManager.create_notice_C_AN(activity, subtype=0)
 
 
