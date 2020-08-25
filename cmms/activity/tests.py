@@ -116,27 +116,27 @@ class ActivitiesTests(APITestCase):
             interval = settings.TOTP_INTERVAL
         else:
             interval = 30
-        
+
         secret_key = self.activity1.secret_key
         totp = pyotp.TOTP(secret_key, interval=interval)
-        
+
         response = self.client.post(url, {
             'otp': totp.now()
         })
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         self.client.force_login(self.user4)
         response = self.client.post(url, {
             'otp': totp.now()
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
         self.client.force_login(self.user3)
         response = self.client.post(url, {
             'irrelevant_fields': 'test'
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
         for dt in [0, 5, 10, 15, 20, 25, 35, 40, 45]:
             otp = totp.at(datetime.datetime.now() - datetime.timedelta(seconds=dt))
             response = self.client.post(url, {
