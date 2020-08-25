@@ -64,7 +64,11 @@ class NoticeBox(models.Model):
                                verbose_name=_('通知'))
     read = models.BooleanField(default=False, verbose_name=_('已读'))
     deleted = models.BooleanField(default=False, verbose_name=_('已删除'))
-    administrative = models.BooleanField(default=False, verbose_name=_('是否为管理员通知'))
+
+    # 在每次 fetch list 时计算 administrative make no sense，此属性旨在起缓存作用。
+    # 如果你没有这种奇怪的需求，你应该把它删掉或移入 Notice model。
+    administrative = models.BooleanField(default=False,
+                                         verbose_name=_('是否为管理员通知'))
 
     def __str__(self):
         return str(self.id)
