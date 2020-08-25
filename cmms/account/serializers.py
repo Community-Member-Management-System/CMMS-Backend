@@ -56,3 +56,8 @@ class LoginSerializer(serializers.Serializer):
 
 class LoginResponseSerializer(NewUserSerializer, DetailSerializer):
     pass
+
+
+class LimitedFilterResponseSerializer(serializers.Serializer):
+    student_id = serializers.CharField(label='学号')
+    real_name = serializers.CharField(label='真实姓名', allow_blank=True)

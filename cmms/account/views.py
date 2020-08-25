@@ -13,22 +13,27 @@ from urllib.request import urlopen
 from xml.etree import ElementTree
 
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import redirect
 from django.conf import settings
 from django.utils.decorators import method_decorator
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins, viewsets, generics, permissions
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
+from communities.models import Community
 from .models import User
 from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, DetailSerializer, \
-    LoginSerializer, LoginResponseSerializer
+    LoginSerializer, LoginResponseSerializer, LimitedFilterResponseSerializer
 from .utils import is_new_user, UserInfoPermission, is_super_user
 from .token import get_tokens_for_user
 
@@ -201,3 +206,36 @@ class UserViewSet(mixins.ListModelMixin,
         except AssertionError:
             # fix complaining drf-yasg
             return PublicUserInfoSerializer
+
+
+class LimitedGetUserByStudentIDView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('student_id', openapi.IN_QUERY, description="学号", type=openapi.TYPE_STRING),
+        openapi.Parameter('community_id', openapi.IN_QUERY, description="社团 ID", type=openapi.TYPE_INTEGER),
+    ], responses={
+        200: LimitedFilterResponseSerializer,
+        404: '找不到学号或社团',
+        403: '非对应社团管理员'
+    })
+    def get(self, request):
+        requester = request.user
+        student_id = request.query_params.get('student_id')
+        community_id = request.query_params.get('community_id')
+        print(student_id, community_id)
+        user = get_object_or_404(User, student_id=student_id)
+        community = get_object_or_404(Community, id=community_id)
+        if community.is_admin(requester) is False:
+            raise PermissionDenied
+        member_status = community.get_member_status(user)
+        if member_status['member'] is True and member_status['valid'] is True:
+            # in club
+            return Response({
+                'user_id': user.id,
+                'real_name': user.real_name
+            })
+        else:
+            # out of club
+            return Response({
+                'user_id': user.id,
+                'real_name': None
+            })

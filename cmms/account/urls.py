@@ -4,6 +4,7 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from . import views
+from .views import LimitedGetUserByStudentIDView
 
 router = routers.SimpleRouter()
 router.register(r'users', views.UserViewSet)
@@ -17,6 +18,7 @@ urlpatterns = [
     path('auth/check', views.LoginCheckView.as_view(), name='check'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
+    path('users/filter', LimitedGetUserByStudentIDView.as_view(), name='limited_user_filter')
 ]
 
 urlpatterns += router.urls
