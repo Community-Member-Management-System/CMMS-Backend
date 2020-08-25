@@ -7,7 +7,7 @@ from communities.models import Community
 from .models import Activity
 import datetime
 
-# Create your tests here.
+
 class ActivitiesTests(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(gid='gid1', student_id='sid1', password='passwd',
@@ -64,7 +64,7 @@ class ActivitiesTests(APITestCase):
             'start_time': '2020-01-01T00:00:00+08:00',
             'end_time': '2020-01-01T01:00:00+08:00'
         })
-        #self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_login(self.user1)
         response = self.client.post(url, {
@@ -98,9 +98,9 @@ class ActivitiesTests(APITestCase):
     def test_token(self):
         response = self.client.get(f'/api/activity/{self.community1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         self.client.force_login(self.user3)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         self.client.force_login(self.user1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
