@@ -29,7 +29,7 @@ class ValidUserPermission(permissions.BasePermission):
     message = '需要补充用户信息（昵称与真实姓名）以使用剩余的功能。'
 
     def has_permission(self, request, view):
-        return valid_user_check(request.user)
+        return request.user.is_authenticated and valid_user_check(request.user)
 
 
 class ValidUserOrReadOnlyPermission(permissions.BasePermission):

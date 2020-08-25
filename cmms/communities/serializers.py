@@ -8,7 +8,6 @@ from django.db.models.query import QuerySet
 
 from account.models import User
 from .models import Community, Invitation
-from activity.serializers import ActivitySerializer
 
 
 class CommunitySerializer(ModelSerializer):

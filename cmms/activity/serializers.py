@@ -1,19 +1,34 @@
 from .models import Activity
 from rest_framework import serializers
 from django.utils import timezone
+from communities.serializers import MemberSerializer, CommunitySimpleSerializer
 
 
 class BaseActivitySerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField('get_status')
+    signed_in_users = serializers.SerializerMethodField('get_signed_in_users')
+    related_community = CommunitySimpleSerializer()
 
-    def get_status(self, obj):
+    def get_status(self, activity: Activity):
         now = timezone.now()
-        if now >= obj.end_time:
+        if now >= activity.end_time:
             return '已结束'
-        elif now > obj.start_time:
+        elif now > activity.start_time:
             return '进行中'
         else:
             return '未开始'
+
+    def get_signed_in_users(self, activity: Activity):
+        signed_in_users = activity.signed_in_users
+        serializer = MemberSerializer(
+            instance=signed_in_users,
+            context={
+                'community': activity.related_community,
+                'admin': activity.related_community.is_admin(self.context.get('user')),
+            },
+            many=True
+        )
+        return serializer.data
 
 
 class ActivitySerializer(BaseActivitySerializer):

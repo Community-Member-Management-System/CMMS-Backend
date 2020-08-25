@@ -9,7 +9,7 @@ from .models import Activity
 import datetime
 import pyotp
 
-# Create your tests here.
+
 class ActivitiesTests(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(gid='gid1', student_id='sid1', password='passwd',
@@ -100,12 +100,13 @@ class ActivitiesTests(APITestCase):
     def test_token(self):
         response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         self.client.force_login(self.user3)
         response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         self.client.force_login(self.user1)
+
         response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
