@@ -64,6 +64,13 @@ class CommunityJoinSerializer(Serializer):
 
 
 class MemberSerializer(ModelSerializer):
+    """
+    Requires context:
+    {
+        'community': A Community object,
+        'admin': (Optional) Is the user an admin?
+    }
+    """
     role = SerializerMethodField()
     real_name = SerializerMethodField()
 
