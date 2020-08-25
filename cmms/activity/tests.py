@@ -45,7 +45,6 @@ class ActivitiesTests(APITestCase):
                                                  end_time=now + timezone.timedelta(minutes=60))
 
     def test_create_activity(self):
-        return
         url = '/api/activity/'
 
         response = self.client.post(url, {
