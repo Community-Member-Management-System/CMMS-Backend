@@ -35,7 +35,7 @@ class ActivityListView(generics.ListCreateAPIView):
             openapi.Parameter(
                 'community',
                 openapi.IN_QUERY,
-                description='list activities by commuinty',
+                description='list activities by community',
                 type=openapi.TYPE_INTEGER
             ),
             openapi.Parameter(
