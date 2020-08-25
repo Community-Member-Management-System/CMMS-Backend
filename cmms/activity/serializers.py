@@ -2,6 +2,7 @@ from .models import Activity
 from rest_framework import serializers
 from django.utils import timezone
 from communities.serializers import MemberSerializer, CommunitySimpleSerializer
+from communities.models import Community
 
 
 class BaseActivitySerializer(serializers.ModelSerializer):
@@ -51,6 +52,10 @@ class ActivitySerializer(BaseActivitySerializer):
         read_only_fields = ['created_date', 'status', 'signed_in_users']
 
 
+class PostVerActivitySerializer(ActivitySerializer):
+    related_community = serializers.PrimaryKeyRelatedField(queryset=Community.objects.all())
+
+
 class ActivityUpdateSerializer(BaseActivitySerializer):
     class Meta:
         model = Activity
@@ -69,6 +74,10 @@ class ActivityUpdateSerializer(BaseActivitySerializer):
         ]
 
         read_only_fields = ['created_date', 'status', 'related_community']
+
+
+class PostVerActivityUpdateSerializer(ActivityUpdateSerializer):
+    related_community = serializers.PrimaryKeyRelatedField(read_only=True)
 
 
 class ActivitySecretKeySerializer(serializers.ModelSerializer):

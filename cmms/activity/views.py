@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from account.models import User
 from .serializers import ActivitySerializer, ActivityUpdateSerializer, ActivitySecretKeySerializer, \
-    ActivityOTPSerializer, ActivitySignedInSerializer
+    ActivityOTPSerializer, ActivitySignedInSerializer, PostVerActivitySerializer, PostVerActivityUpdateSerializer
 from .permissions import IsAdminOrReadOnly, IsAdmin
 from .models import Activity, verify_otp
 from account.utils import ValidUserOrReadOnlyPermission, ValidUserPermission
@@ -22,7 +22,6 @@ from notice.utils import NoticeManager
 
 # Create your views here.
 class ActivityListView(generics.ListCreateAPIView):
-    serializer_class = ActivitySerializer
     permission_classes = [IsAdminOrReadOnly,
                           ValidUserOrReadOnlyPermission]
     search_fields = ['title', 'description']
@@ -69,9 +68,14 @@ class ActivityListView(generics.ListCreateAPIView):
                 raise PermissionDenied
             NoticeManager.create_notice_C_AN(activity, subtype=0)
 
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return PostVerActivitySerializer
+        else:
+            return ActivitySerializer
+
 
 class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ActivityUpdateSerializer
     permission_classes = [IsAdminOrReadOnly,
                           ValidUserOrReadOnlyPermission]
     queryset = Activity.objects.all()
@@ -80,6 +84,12 @@ class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         with transaction.atomic():
             activity = serializer.save()
             NoticeManager.create_notice_C_AN(activity, subtype=1)
+
+    def get_serializer_class(self):
+        if self.request.method == 'PUT' or self.request.method == 'PATCH':
+            return PostVerActivityUpdateSerializer
+        else:
+            return ActivityUpdateSerializer
 
 
 class ActivitySecretKeyView(generics.RetrieveAPIView):
