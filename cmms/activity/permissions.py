@@ -7,3 +7,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.related_community.admins.filter(id=request.user.id).exists()
+
+
+class IsAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.related_community.admins.filter(id=request.user.id).exists()

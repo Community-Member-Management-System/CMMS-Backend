@@ -3,12 +3,17 @@ from drf_yasg import openapi
 from django.db import transaction
 from django.shortcuts import render
 from django.http import JsonResponse
-from rest_framework import generics
+from rest_framework import generics, mixins, viewsets
 from rest_framework import permissions
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
-from .serializers import ActivitySerializer, ActivityUpdateSerializer, ActivitySecretKeySerializer,\
-    ActivityOTPSerializer
-from .permissions import IsAdminOrReadOnly
+from rest_framework.response import Response
+
+from account.models import User
+from .serializers import ActivitySerializer, ActivityUpdateSerializer, ActivitySecretKeySerializer, \
+    ActivityOTPSerializer, ActivitySignedInSerializer
+from .permissions import IsAdminOrReadOnly, IsAdmin
 from .models import Activity, verify_otp
 from account.utils import ValidUserOrReadOnlyPermission, ValidUserPermission
 from notice.utils import NoticeManager
@@ -76,7 +81,7 @@ class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 class ActivitySecretKeyView(generics.RetrieveAPIView):
     serializer_class = ActivitySecretKeySerializer
-    permission_classes = [IsAdminOrReadOnly,
+    permission_classes = [IsAdmin,
                           ValidUserOrReadOnlyPermission]
     queryset = Activity.objects.all()
 
@@ -103,3 +108,26 @@ class ActivitySignInView(generics.GenericAPIView):
                 return JsonResponse({'otp': 'wrong otp'}, status=400)
         else:
             return JsonResponse(serializer.errors, status=400)
+
+
+class ActivitySignedInViewSet(mixins.RetrieveModelMixin,
+                              viewsets.GenericViewSet):
+    permission_classes = [IsAdmin]
+    queryset = Activity.objects.all()
+    serializer_class = ActivitySignedInSerializer
+
+    @action(detail=False, methods=['POST'])
+    def add(self, request, pk, user_id):
+        activity: Activity = self.get_object()
+        user = get_object_or_404(User, pk=user_id)
+        activity.signed_in_users.add(user)
+        serializer = self.get_serializer(activity)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['POST'])
+    def remove(self, request, pk, user_id):
+        activity: Activity = self.get_object()
+        user = get_object_or_404(User, pk=user_id)
+        activity.signed_in_users.remove(user)
+        serializer = self.get_serializer(activity)
+        return Response(serializer.data)

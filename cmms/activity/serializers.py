@@ -65,3 +65,10 @@ class ActivitySecretKeySerializer(serializers.ModelSerializer):
 
 class ActivityOTPSerializer(serializers.Serializer):
     otp = serializers.CharField()
+
+
+class ActivitySignedInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+
+        fields = ['signed_in_users']
