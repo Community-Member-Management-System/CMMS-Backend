@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 from account.models import User
@@ -6,6 +7,7 @@ from django.utils import timezone
 from communities.models import Community
 from .models import Activity
 import datetime
+import pyotp
 
 # Create your tests here.
 class ActivitiesTests(APITestCase):
@@ -64,7 +66,7 @@ class ActivitiesTests(APITestCase):
             'start_time': '2020-01-01T00:00:00+08:00',
             'end_time': '2020-01-01T01:00:00+08:00'
         })
-        #self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_login(self.user1)
         response = self.client.post(url, {
@@ -96,11 +98,50 @@ class ActivitiesTests(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_token(self):
-        response = self.client.get(f'/api/activity/{self.community1.id}/secret_key')
+        response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
         self.client.force_login(self.user3)
+        response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
         self.client.force_login(self.user1)
+        response = self.client.get(f'/api/activity/{self.activity1.id}/secret_key')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sign_in(self):
+        url = f'/api/activity/{self.activity1.id}/sign_in'
+        if hasattr(settings, 'TOTP_INTERVAL'):
+            interval = settings.TOTP_INTERVAL
+        else:
+            interval = 30
+        
+        secret_key = self.activity1.secret_key
+        totp = pyotp.TOTP(secret_key, interval=interval)
+        
+        response = self.client.post(url, {
+            'otp': totp.now()
+        })
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        self.client.force_login(self.user4)
+        response = self.client.post(url, {
+            'otp': totp.now()
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        self.client.force_login(self.user3)
+        response = self.client.post(url, {
+            'irrelevant_fields': 'test'
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        for dt in [0, 5, 10, 15, 20, 25, 35, 40, 45]:
+            otp = totp.at(datetime.datetime.now() - datetime.timedelta(seconds=dt))
+            response = self.client.post(url, {
+                'otp': otp
+            })
+            if dt < 30:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
