@@ -47,9 +47,9 @@ class LoginAndLogoutTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in response.data:
-            if i["pk"] == 1:
+            if i["id"] == 1:
                 self.assertEqual(i["profile"], "testprofile")
-            elif i["pk"] == 2:
+            elif i["id"] == 2:
                 self.assertEqual(i["nick_name"], "myname")
             self.assertEqual(i.get("real_name"), None)  # not leaking private info
 
