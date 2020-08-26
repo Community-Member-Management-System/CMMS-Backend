@@ -13,7 +13,7 @@ class PublicUserInfoSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('pk', 'nick_name', 'avatar', 'profile')
+        fields = ('id', 'nick_name', 'avatar', 'profile')
 
 
 class CurrentUserInfoSerializer(serializers.ModelSerializer):
