@@ -130,8 +130,8 @@ NOTICE_MODEL = 'notice.Notice'
 ACTIVITY_MODEL = 'activity.Activity'
 COMMENT_MODEL = 'activity.Comment'
 
-CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
-CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
+CAS_PROXY_PAGE = local.CAS_PROXY_PAGE
+CAS_SERVICE_URL = local.CAS_SERVICE_URL  # CAS Test Server
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
