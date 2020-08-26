@@ -66,11 +66,10 @@ class CommunityRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
         }
 
     def get_queryset(self):
-        return Community.objects.all()
-        # if self.request.method == 'DELETE':
-        #     return Community.objects.all()
-        # else:
-        #     return Community.objects.filter(valid=True)
+        if self.request.method == 'DELETE':
+            return Community.objects.all()
+        else:
+            return Community.objects.filter(valid=True)
 
     def perform_destroy(self, instance: Community) -> None:  # type: ignore
         request: Request = self.request  # type: ignore
