@@ -66,7 +66,8 @@ class ActivityListView(generics.ListCreateAPIView):
             activity = serializer.save()
             if not activity.related_community.admins.filter(id=self.request.user.id).exists():
                 raise PermissionDenied
-            NoticeManager.create_notice_C_AN(activity, subtype=0)
+            mail_sent = self.request.data.get('mail', False)
+            NoticeManager.create_notice_C_AN(activity, subtype=0, if_send_mail=mail_sent)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
