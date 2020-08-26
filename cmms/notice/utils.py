@@ -233,8 +233,9 @@ class NoticeManager:
     @classmethod
     def delete(cls, user: User, pk: int) -> None:
         object = cls.__get_notice_box(user, pk)
-        object.deleted = True
-        object.save()
+        # object.deleted = True
+        # object.save()
+        object.delete()
 
     @classmethod
     def access(cls, user: User, pk: int) -> Notice:
