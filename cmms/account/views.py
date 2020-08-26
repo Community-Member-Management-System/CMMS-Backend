@@ -155,8 +155,6 @@ class LogoutView(APIView):
             service = request.build_absolute_uri('/')
             if settings.CAS_PROXY_PAGE:
                 service = f"{settings.CAS_PROXY_PAGE}?{urlencode({'jump': service})}"
-            response_dict['detail'] += "注意：此操作不会将您从 CAS 服务器上注销。" \
-                                       f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
             response_dict['cas_logout'] = f'{settings.CAS_SERVICE_URL}/logout?{urlencode({"service": service})}'
         response = Response(response_dict)
         response.delete_cookie('refresh')
