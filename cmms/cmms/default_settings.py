@@ -37,3 +37,5 @@ DATABASES = {
 
 CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
 CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
+
+CUSTOM_MEDIA_ROOT = None

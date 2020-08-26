@@ -165,7 +165,10 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 
 # uploads
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
+if local.CUSTOM_MEDIA_ROOT:
+    MEDIA_ROOT = local.CUSTOM_MEDIA_ROOT
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 MEDIA_URL = '/uploads/'
 
 # TOTP
