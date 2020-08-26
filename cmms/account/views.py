@@ -108,6 +108,7 @@ class CASLoginView(BaseLoginView):
             response.set_cookie('refresh', jwt['refresh'])
             response.set_cookie('access', jwt['access'])
             response.set_cookie('login', 'true')
+            response.set_cookie('cas', 'true')
             return response
         return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
                             status=status.HTTP_401_UNAUTHORIZED)
@@ -147,12 +148,21 @@ class LogoutView(APIView):
     })
     def post(self, request):
         logout(request)
-        response = Response({
-            "detail": "注销成功。注意：此操作不会将您从 CAS 服务器上注销。"
-                      f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
-        })
+        response_dict = {
+            'detail': '注销成功。'
+        }
+        if request.COOKIES.get('cas', None):
+            service = request.build_absolute_uri('/')
+            if settings.CAS_PROXY_PAGE:
+                service = f"{settings.CAS_PROXY_PAGE}?{urlencode({'jump': service})}"
+            response_dict['detail'] += "注意：此操作不会将您从 CAS 服务器上注销。" \
+                                       f"如果您正在使用公用计算机，请手动至 {settings.CAS_SERVICE_URL}/logout 退出账号。"
+            response_dict['cas_logout'] = f'{settings.CAS_SERVICE_URL}/logout?{urlencode({"service": service})}'
+        response = Response(response_dict)
         response.delete_cookie('refresh')
         response.delete_cookie('access')
+        response.delete_cookie('login')
+        response.delete_cookie('cas')
         return response
 
 
