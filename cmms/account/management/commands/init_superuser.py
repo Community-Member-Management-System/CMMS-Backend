@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if User.objects.count() == 0:
             username = "root"
-            email = "root@cmms"  # hard-coded now
+            email = "root@cmms.local"  # hard-coded now
             password = ''.join(random.SystemRandom().choice(string.digits +
                                                             string.ascii_letters) for _ in range(8))
             print('Creating account for superuser (username is root)')
