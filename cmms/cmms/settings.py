@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'account',
     'communities',
@@ -173,3 +174,9 @@ MEDIA_URL = '/uploads/'
 
 # TOTP
 TOTP_INTERVAL = 30
+
+# Crontab
+CRONJOBS = (
+    # 每小时删除数据库中标记为 deleted 的 NoticeBox 行
+    ('0 */1 * * *', 'notice.util.NoticeManager.flush_deleted'),
+)

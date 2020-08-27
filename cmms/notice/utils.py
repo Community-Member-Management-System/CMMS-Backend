@@ -19,6 +19,11 @@ class NoticeManager:
     __user_manager = User.objects
     __C_AN_subtype_map = {0: '创建了', 1: '更新了', 2: '删除了'}
 
+    # 从数据库中删除所有标记为 deleted 的 NoticeBox 条目
+    @classmethod
+    def flush_deleted(cls) -> None:
+        cls.__notice_box_manager.filter(deleted=True).delete()
+
     # NoticeBox 条目获取和鉴权
     @classmethod
     def __get_notice_box(cls, user: User, pk: int) -> NoticeBox:
@@ -233,9 +238,11 @@ class NoticeManager:
     @classmethod
     def delete(cls, user: User, pk: int) -> None:
         object = cls.__get_notice_box(user, pk)
-        # object.deleted = True
-        # object.save()
-        object.delete()
+        object.deleted = True
+        object.save()
+
+        # 延迟删除策略
+        # object.delete()
 
     @classmethod
     def access(cls, user: User, pk: int) -> Notice:

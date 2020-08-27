@@ -1,5 +1,15 @@
 # notice
 
+## Deployment
+
+此模块使用 django-crontab 进行数据库的自动维护，因此部署在生产环境中前需要运行以下命令：
+
+```shell
+python manage.py crontab add
+```
+
+这主要用于定期删除被标记为 `deleted` 的 `NoticeBox` 行。因此不这么做，而是手动维护也是可以的。
+
 ## API
 
 ### 请求通知列表
