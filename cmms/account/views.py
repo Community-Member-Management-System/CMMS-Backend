@@ -110,7 +110,7 @@ class CASLoginView(BaseLoginView):
             response.set_cookie('login', 'true')
             response.set_cookie('cas', 'true')
             return response
-        return HttpResponse(f"登录失败。<a href='/'>返回主页</a>",
+        return HttpResponse("登录失败。<a href='/'>返回主页</a>",
                             status=status.HTTP_401_UNAUTHORIZED)
 
     @swagger_auto_schema(auto_schema=None)

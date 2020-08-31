@@ -189,7 +189,7 @@ class CommunitiesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.client.logout()
 
-        url = f'/api/community/invitation/'
+        url = '/api/community/invitation/'
         self.login_as_user(self.user1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

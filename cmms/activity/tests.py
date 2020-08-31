@@ -94,7 +94,7 @@ class ActivitiesTests(APITestCase):
         self.assertEqual(response.data[0]['title'], 'title1')
 
         self.client.force_login(self.user2)
-        response = self.client.get(f'/api/activity/?only_mine')
+        response = self.client.get('/api/activity/?only_mine')
         self.assertEqual(len(response.data), 2)
 
     def test_token(self):
