@@ -72,6 +72,9 @@ class Community(models.Model):
         )]
     )
 
+    def __str__(self):
+        return f"{self.name} ({'通过审核' if self.valid else '未通过审核'})"
+
     def get_member_status(self, user: Optional[User]) -> MemberStatusDictType:
         """
         判断某个用户在社团中的情况。
@@ -126,6 +129,9 @@ class Membership(models.Model):
     date_joined = models.DateTimeField(default=timezone.now, verbose_name=_('加入时间'))
     valid = models.BooleanField(default=False, verbose_name=_('成员是否通过审核'))
 
+    def __str__(self):
+        return f"{self.user} <-> {self.community.name} ({'通过审核' if self.valid else '未通过审核'})"
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['user', 'community'], name='user_community_unique')
@@ -143,3 +149,6 @@ class Invitation(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_('社团'),
     )
+
+    def __str__(self):
+        return f'{self.community.name} 对 {self.user} 的邀请'
