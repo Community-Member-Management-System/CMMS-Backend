@@ -50,6 +50,8 @@ class ActivitySerializer(BaseActivitySerializer):
             'signed_in_users',
             'created_date',
             'status',
+            'longitude',
+            'latitude'
         ]
 
         read_only_fields = ['created_date', 'status', 'signed_in_users']
@@ -74,6 +76,8 @@ class ActivityUpdateSerializer(BaseActivitySerializer):
             'signed_in_users',  # TODO: Do we need another API to sign in users incrementally? E.g., sign in users [1,2]
             'created_date',
             'status',
+            'longitude',
+            'latitude'
         ]
 
         read_only_fields = ['created_date', 'status', 'related_community']

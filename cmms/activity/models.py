@@ -35,6 +35,8 @@ class Activity(models.Model):
     secret_key = models.CharField(max_length=32,
                                   verbose_name=_('签到密钥'),
                                   default=random_secret_key)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name=_('经度'), null=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name=_('纬度'), null=True)
 
 
 class Comment(models.Model):
