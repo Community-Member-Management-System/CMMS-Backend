@@ -65,7 +65,8 @@ class ActivityListView(generics.ListCreateAPIView):
         with transaction.atomic():
             activity = serializer.save()
             if not activity.related_community.admins.filter(id=self.request.user.id).exists():
-                raise PermissionDenied
+                if not self.request.user.is_superuser:
+                    raise PermissionDenied
             mail_sent = self.request.data.get('mail', False)
             NoticeManager.create_notice_C_AN(activity, subtype=0, if_send_mail=mail_sent)
 
