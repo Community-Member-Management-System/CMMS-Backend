@@ -56,6 +56,7 @@ class CommunitySimpleSerializer(ModelSerializer):
     class Meta:
         model = Community
         fields = ('id', 'name', 'profile', 'avatar', 'rec_link', 'valid')
+        read_only_fields = ('valid',)
 
 
 class CommunityJoinSerializer(Serializer):
