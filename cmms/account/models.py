@@ -51,6 +51,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_('对 admin/ 管理页的只读权限'),
     )  # for compatibility with Django Admin
+    is_active = models.BooleanField(
+        _('是否有效'),
+        default=True,
+        help_text=_('是否为有效用户。去除选择以冻结用户。')
+    )
 
     # It's easier to integrate with DRF by combining the two tables together
     # real_name_vis = models.CharField(max_length=1, choices=VISIBILITY_CHOICES, default='2')

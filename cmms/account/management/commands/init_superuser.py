@@ -22,4 +22,10 @@ class Command(BaseCommand):
             admin.save()
             print(f'Password is {password}. Please change your password immediately after login!')
         else:
-            print('Superuser accounts can only be initialized if no Accounts exist')
+            root_user = User.objects.filter(gid="root").first()
+            if root_user.is_superuser is False:
+                root_user.is_superuser = True
+                root_user.save()
+                print('Restored permission of user root.')
+            else:
+                print('Superuser accounts can only be initialized if no active "root" account exists')
