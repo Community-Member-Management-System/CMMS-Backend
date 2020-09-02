@@ -24,14 +24,14 @@ class UserAdmin(BaseAdmin):
         self.message_user(request, (
             '设置了 %d 名用户为系统管理员。'
         ) % updated, messages.SUCCESS)
-    mark_superuser.short_description = "Mark selected users as superuser"
+    mark_superuser.short_description = "Mark selected users as superuser"  # type: ignore
 
     def unmark_superuser(self, request, queryset):
         updated = queryset.update(is_superuser=False)
         self.message_user(request, (
             '取消设置了 %d 名用户为系统管理员。'
         ) % updated, messages.SUCCESS)
-    unmark_superuser.short_description = "Unmark selected users as superuser"
+    unmark_superuser.short_description = "Unmark selected users as superuser"  # type: ignore
 
 
 admin.site.register(User, UserAdmin)
