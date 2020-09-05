@@ -31,6 +31,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from communities.models import Community
+from activity.models import Activity
 from .models import User
 from .serializers import PublicUserInfoSerializer, CurrentUserInfoSerializer, UserCheckSerializer, DetailSerializer, \
     LoginSerializer, LoginResponseSerializer, LimitedFilterResponseSerializer
@@ -219,7 +220,7 @@ class UserViewSet(mixins.ListModelMixin,
 class LimitedGetUserByStudentIDView(APIView):
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('student_id', openapi.IN_QUERY, description="学号", type=openapi.TYPE_STRING),
-        openapi.Parameter('community_id', openapi.IN_QUERY, description="社团 ID", type=openapi.TYPE_INTEGER),
+        openapi.Parameter('activity_id', openapi.IN_QUERY, description="活动 ID", type=openapi.TYPE_INTEGER),
     ], responses={
         200: LimitedFilterResponseSerializer,
         404: '找不到学号或社团',
@@ -228,10 +229,11 @@ class LimitedGetUserByStudentIDView(APIView):
     def get(self, request):
         requester = request.user
         student_id = request.query_params.get('student_id')
-        community_id = request.query_params.get('community_id')
-        print(student_id, community_id)
+        activity_id = request.query_params.get('activity_id')
+        print(student_id, activity_id)
+        activity = get_object_or_404(Activity, id=activity_id)
         user = get_object_or_404(User, student_id=student_id)
-        community = get_object_or_404(Community, id=community_id)
+        community = activity.related_community
         if community.is_admin(requester) is False:
             raise PermissionDenied
         member_status = community.get_member_status(user)
