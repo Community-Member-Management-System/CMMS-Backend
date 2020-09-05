@@ -110,6 +110,12 @@ class ActivitySignInView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
         activity = self.get_object()
+
+        now = timezone.now()
+        start_time = activity.start_time
+        end_time = activity.end_time
+        if now < start_time or now > end_time:
+            return JsonResponse({'activity': '活动未在举行中！'})
         # if not activity.related_community.members.filter(id=user.id).exists():
         #     return JsonResponse({'user': 'not a member of the community'}, status=400)
 
