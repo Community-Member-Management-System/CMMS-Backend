@@ -52,4 +52,4 @@ class CommunityEventRSSFeed(FeedConfig, Feed):  # type: ignore
         return f"社团 {item.name} 的活动 RSS"
 
     def link(self, item: Community):
-        return f'#/tourist/activity/{item.id}'  # fixme
+        return f'#/tourist/community/{item.id}'  # fixme
