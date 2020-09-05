@@ -278,6 +278,11 @@ class CommunityUserInvitationViewSet(mixins.ListModelMixin,
         community = invitation.community
         with transaction.atomic():
             community.members.add(invitation.user, through_defaults={'valid': True})
+            NoticeManager.create_notice_C_AP(
+                related_user=invitation.user,
+                related_community=invitation.community,
+                subtype=3
+            )
             invitation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
