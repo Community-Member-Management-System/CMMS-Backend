@@ -37,6 +37,10 @@ class Activity(models.Model):
                                   default=random_secret_key)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name=_('经度'), null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name=_('纬度'), null=True)
+    mail = models.BooleanField(
+        default=False,
+        verbose_name=_('是否发送邮件通知')
+    )
 
     def __str__(self):
         return f'{self.title} (by {self.related_community.name})'

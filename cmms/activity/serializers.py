@@ -51,7 +51,8 @@ class ActivitySerializer(BaseActivitySerializer):
             'created_date',
             'status',
             'longitude',
-            'latitude'
+            'latitude',
+            'mail'
         ]
 
         read_only_fields = ['created_date', 'status', 'signed_in_users']
@@ -77,7 +78,8 @@ class ActivityUpdateSerializer(BaseActivitySerializer):
             'created_date',
             'status',
             'longitude',
-            'latitude'
+            'latitude',
+            'mail'
         ]
 
         read_only_fields = ['created_date', 'status', 'related_community']
