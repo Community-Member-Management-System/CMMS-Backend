@@ -110,8 +110,8 @@ class ActivitySignInView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
         activity = self.get_object()
-        if not activity.related_community.members.filter(id=user.id).exists():
-            return JsonResponse({'user': 'not a member of the community'}, status=400)
+        # if not activity.related_community.members.filter(id=user.id).exists():
+        #     return JsonResponse({'user': 'not a member of the community'}, status=400)
 
         serializer = self.get_serializer(data=request.data)
 
