@@ -39,3 +39,12 @@ CAS_PROXY_PAGE = "http://home.ustc.edu.cn/~taoky/cas.html"
 CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
 
 CUSTOM_MEDIA_ROOT = None
+STATIC_ROOT = None
+
+DEFAULT_FROM_EMAIL = "cmms@localhost"
+EMAIL_HOST = "localhost"
+EMAIL_HOST_USER = "localhost"
+EMAIL_PORT = 25
+EMAIL_HOST_PASSWORD = ""
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False

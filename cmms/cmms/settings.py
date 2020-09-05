@@ -153,17 +153,17 @@ ENABLE_EMAIL = False
 if DEBUG:
     ENABLE_EMAIL = True
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = local.DEFAULT_FROM_EMAIL
+EMAIL_HOST = local.EMAIL_HOST
+EMAIL_HOST_USER = local.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = local.EMAIL_HOST_PASSWORD
+EMAIL_PORT = local.EMAIL_PORT
 DEFAULT_EMAIL_PREFIX = '[USTC CMMS] '
 
 # EMAIL_USE_TLS / EMAIL_USE_SSL are mutually exclusive, so only set one of those settings to True.
 
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
+EMAIL_USE_TLS = local.EMAIL_USE_TLS
+EMAIL_USE_SSL = local.EMAIL_USE_SSL
 
 # uploads
 if local.CUSTOM_MEDIA_ROOT:
@@ -171,6 +171,7 @@ if local.CUSTOM_MEDIA_ROOT:
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 MEDIA_URL = '/uploads/'
+STATIC_ROOT = local.STATIC_ROOT
 
 # TOTP
 TOTP_INTERVAL = 30
