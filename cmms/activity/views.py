@@ -85,7 +85,8 @@ class ActivityDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         with transaction.atomic():
             activity = serializer.save()
-            NoticeManager.create_notice_C_AN(activity, subtype=1)
+            mail_sent = self.request.data.get('mail', False)
+            NoticeManager.create_notice_C_AN(activity, subtype=1, if_send_mail=mail_sent)
 
     def get_serializer_class(self):
         if self.request.method == 'PUT' or self.request.method == 'PATCH':
