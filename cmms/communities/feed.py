@@ -32,7 +32,7 @@ class FeedConfig:
 
     def item_link(self, item: Activity):
         # fixme: after frontend finishes, the actual link shall be updated here
-        return f'/community/{item.id}/activities'
+        return f'#/tourist/activity/{item.id}'
 
     def item_location(self, item: Activity):
         return item.location
@@ -52,4 +52,4 @@ class CommunityEventRSSFeed(FeedConfig, Feed):  # type: ignore
         return f"社团 {item.name} 的活动 RSS"
 
     def link(self, item: Community):
-        return f'/community/{item.id}'  # fixme
+        return f'#/tourist/activity/{item.id}'  # fixme
