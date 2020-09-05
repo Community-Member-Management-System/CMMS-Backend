@@ -230,9 +230,13 @@ class LimitedGetUserByStudentIDView(APIView):
         requester = request.user
         student_id = request.query_params.get('student_id')
         activity_id = request.query_params.get('activity_id')
+        user_id = request.query_params.get('user_id')
         print(student_id, activity_id)
         activity = get_object_or_404(Activity, id=activity_id)
-        user = get_object_or_404(User, student_id=student_id)
+        if student_id:
+            user = get_object_or_404(User, student_id=student_id)
+        else:
+            user = get_object_or_404(User, id=user_id)
         community = activity.related_community
         if community.is_admin(requester) is False:
             raise PermissionDenied
@@ -241,11 +245,19 @@ class LimitedGetUserByStudentIDView(APIView):
             # in club
             return Response({
                 'user_id': user.id,
-                'real_name': user.real_name
+                'nick_name': user.nick_name,
+                'real_name': user.real_name,
+                'phone': user.phone,
+                'email': user.email,
+                'student_id': user.student_id
             })
         else:
             # out of club
             return Response({
                 'user_id': user.id,
-                'real_name': None
+                'nick_name': user.nick_name,
+                'real_name': None,
+                'phone': None,
+                'email': None,
+                'student_id': user.student_id
             })
