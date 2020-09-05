@@ -149,8 +149,8 @@ REST_FRAMEWORK = {
     )
 }
 
-ENABLE_EMAIL = False
-if DEBUG:
+ENABLE_EMAIL = local.ENABLE_EMAIL
+if DEBUG and not ENABLE_EMAIL:
     ENABLE_EMAIL = True
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = local.DEFAULT_FROM_EMAIL

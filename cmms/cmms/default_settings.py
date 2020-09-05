@@ -41,6 +41,7 @@ CAS_SERVICE_URL = "https://ucas.ustc.edu.cn"  # CAS Test Server
 CUSTOM_MEDIA_ROOT = None
 STATIC_ROOT = None
 
+ENABLE_EMAIL = False
 DEFAULT_FROM_EMAIL = "cmms@localhost"
 EMAIL_HOST = "localhost"
 EMAIL_HOST_USER = "localhost"
