@@ -125,11 +125,11 @@ class ActivitiesTests(APITestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        self.client.force_login(self.user4)
-        response = self.client.post(url, {
-            'otp': totp.now()
-        })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        # self.client.force_login(self.user4)
+        # response = self.client.post(url, {
+        #     'otp': totp.now()
+        # })
+        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         self.client.force_login(self.user3)
         response = self.client.post(url, {
