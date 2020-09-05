@@ -348,6 +348,11 @@ class CommunityAdminSetView(APIView):
                     community.admins.add(user)
                 elif action == 'unset' and admin_status is True:
                     community.admins.remove(user)
+                    NoticeManager.create_notice_PC(
+                        related_user=user,
+                        related_community=community,
+                        subtype=1
+                    )
                 else:
                     raise NotAcceptable('错误的操作。')
             else:
